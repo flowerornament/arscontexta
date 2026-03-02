@@ -5,6 +5,7 @@ context: fork
 model: opus
 allowed-tools: Read, Write, Edit, Grep, Glob, Bash, AskUserQuestion
 argument-hint: "[domain name or description, e.g. 'therapy sessions' or 'creative writing']"
+user-invocable: true
 ---
 
 You are extending an existing knowledge system with a new domain. This is composition, not replacement. The new domain must coexist with existing domains while maintaining its own vocabulary, schema, and processing patterns. The shared graph (wiki links, hub MOC, description fields) connects everything.
@@ -376,7 +377,7 @@ Update `.mcp.json` or equivalent configuration to include the new collection.
 
 ### Step 10: Domain processing skills (if processing >= moderate)
 
-If the new domain needs its own processing skills (because processing intensity or vocabulary differs from existing domain), generate domain-adapted versions of reduce/reflect/verify skills.
+If the new domain needs its own processing skills (because processing intensity or vocabulary differs from existing domain), generate domain-adapted versions of reduce/arscontexta:connect/verify skills.
 
 If the existing skills can handle multi-domain routing by note type, update them instead of creating duplicates.
 
@@ -423,7 +424,7 @@ Your system now has [N] domains:
 Next steps:
 1. Capture your first [domain:note] in [domain-folder]/
 2. Cross-domain connections will emerge naturally as you work
-3. Run /health when /next flags maintenance issues in either domain
+3. Run /arscontexta:health when /arscontexta:next flags maintenance issues in either domain
 === END VALIDATION ===
 ```
 

@@ -1,54 +1,58 @@
-#!/bin/bash
-# Ars Contexta — Auto-Commit Hook
-# Commits changes after writes to keep the vault in version control.
-# Runs as async PostToolUse hook on Write events.
-#
-# Async hooks don't reliably receive tool input — commit all pending changes.
+#!/usr/bin/env bash
+# auto-commit.sh — PostToolUse(Write|Edit) hook (async)
+# Auto-commits changes with a descriptive message.
+# Only runs when cwd is an Ars Contexta vault with git enabled.
 
-set -e
+set -euo pipefail
 
-# Change to project directory
-cd "${CLAUDE_PROJECT_DIR:-$(pwd)}"
-
-# Only run in Ars Contexta vaults
-GUARD_DIR="$(cd "$(dirname "$0")" && pwd)"
-"$GUARD_DIR/vaultguard.sh" || exit 0
-
-# Check config — skip if git automation is disabled
-READ_CONFIG="$(cd "$(dirname "$0")" && pwd)/read_config.sh"
-if [ "$(bash "$READ_CONFIG" "git" "true")" != "true" ]; then
+# Vault-awareness check
+if [ ! -f ".arscontexta" ]; then
   exit 0
 fi
 
-# Only commit if inside a git repository
+# Check git is enabled in vault config
+if ! grep -q 'git: true' .arscontexta 2>/dev/null; then
+  exit 0
+fi
+
+# Check we're in a git repo
 if ! git rev-parse --is-inside-work-tree &>/dev/null; then
   exit 0
 fi
 
-# Stage all changes
-git add -A 2>/dev/null || exit 0
+# Get the file path from hook input
+INPUT=$(cat)
+FILE_PATH=$(echo "$INPUT" | grep -o '"file_path"[[:space:]]*:[[:space:]]*"[^"]*"' | head -1 | sed 's/"file_path"[[:space:]]*:[[:space:]]*"//;s/"$//')
 
-# Check if there are staged changes
-if git diff --cached --quiet 2>/dev/null; then
+if [ -z "$FILE_PATH" ]; then
   exit 0
 fi
 
-# Build commit message from changed files
-CHANGED_FILES=$(git diff --cached --name-only 2>/dev/null | head -5)
-FILE_COUNT=$(git diff --cached --name-only 2>/dev/null | wc -l | tr -d ' ')
-STATS=$(git diff --cached --stat 2>/dev/null | tail -1)
+# Determine a descriptive commit message based on file location
+RELATIVE_PATH="${FILE_PATH#$(pwd)/}"
+BASENAME=$(basename "$FILE_PATH" .md)
 
-if [ "$FILE_COUNT" -eq 1 ]; then
-  FILENAME=$(echo "$CHANGED_FILES" | head -1)
-  MSG="Auto: $FILENAME"
-else
-  MSG="Auto: $FILE_COUNT files"
-fi
+case "$RELATIVE_PATH" in
+  notes/*)
+    MSG="claim: update $BASENAME"
+    ;;
+  inbox/*)
+    MSG="inbox: add $BASENAME"
+    ;;
+  ops/*)
+    MSG="ops: update $BASENAME"
+    ;;
+  templates/*)
+    MSG="template: update $BASENAME"
+    ;;
+  *)
+    MSG="vault: update $RELATIVE_PATH"
+    ;;
+esac
 
-if [ -n "$STATS" ]; then
-  MSG="$MSG | $STATS"
-fi
-
-git commit -m "$MSG" --no-verify 2>/dev/null || true
+# Stage and commit
+git add "$FILE_PATH" 2>/dev/null || true
+git diff --cached --quiet 2>/dev/null && exit 0
+git commit -m "$MSG" --quiet 2>/dev/null || true
 
 exit 0

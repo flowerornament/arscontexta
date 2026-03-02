@@ -277,7 +277,7 @@ Rank by frequency * impact. The most frequent, highest-impact friction patterns 
 
 ## PHASE 5: Consult Research
 
-Ground the evidence in research. This is what separates /architect from ad-hoc troubleshooting — every recommendation connects to specific research claims, not general intuition.
+Ground the evidence in research. This is what separates /arscontexta:architect from ad-hoc troubleshooting — every recommendation connects to specific research claims, not general intuition.
 
 Read the reference files:
 
@@ -348,7 +348,7 @@ Synthesize evidence from Phases 2-5 into 3-5 concrete recommendations, ranked by
 | Risk | reversible / partially reversible / irreversible | What could go wrong? |
 | Evidence strength | strong (5+ data points) / moderate (3-4) / speculative (1-2) | How much supporting evidence? |
 
-**Limit to 3-5 recommendations.** More than 5 creates decision paralysis. If you found more issues, prioritize ruthlessly — the rest can wait for the next /architect pass.
+**Limit to 3-5 recommendations.** More than 5 creates decision paralysis. If you found more issues, prioritize ruthlessly — the rest can wait for the next /arscontexta:architect pass.
 
 ### Priority Ordering
 
@@ -480,7 +480,7 @@ Implement the selected recommendations following the steps listed. For each impl
    ```markdown
    ## YYYY-MM-DD: [change title]
 
-   **Source:** /architect — [evidence summary]
+   **Source:** /arscontexta:architect — [evidence summary]
    **Change:** [what was modified, which files]
    **Research:** [supporting claims]
    **Risk:** [risk assessment]
@@ -506,7 +506,7 @@ Implementation complete.
 - Optionally ask why — capture the reasoning as a new observation if it reveals design philosophy
 - Mark the recommendation as "considered and deferred" — do not keep re-surfacing it
 
-### When Evidence Suggests /reseed
+### When Evidence Suggests /arscontexta:reseed
 
 If analysis reveals:
 - Dimension incoherence across >3 dimensions
@@ -514,10 +514,10 @@ If analysis reveals:
 - Three-space boundaries dissolved
 - Template divergence >40%
 
-Then recommend /reseed instead of incremental patches:
+Then recommend /arscontexta:reseed instead of incremental patches:
 ```
   NOTICE: The evidence suggests systemic drift across multiple dimensions.
-  Incremental patching may create more incoherence. Consider running /reseed
+  Incremental patching may create more incoherence. Consider running /arscontexta:reseed
   for a principled re-derivation from first principles.
 
   Drift detected in: [list dimensions]
@@ -530,7 +530,7 @@ Then recommend /reseed instead of incremental patches:
 
 ### No ops/derivation.md
 
-Recommendations based on current state analysis only. Note in report: "Without derivation history, recommendations cannot assess drift or design intent. Consider running /reseed to establish a derivation baseline."
+Recommendations based on current state analysis only. Note in report: "Without derivation history, recommendations cannot assess drift or design intent. Consider running /arscontexta:reseed to establish a derivation baseline."
 
 ### No ops/observations/ or ops/sessions/
 

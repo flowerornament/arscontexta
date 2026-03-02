@@ -1,6 +1,6 @@
 ---
 name: recommend
-description: Get research-backed architecture advice for your knowledge system. Describe your use case, constraints, and goals — get specific recommendations grounded in TFT research with rationale for each decision. Triggers on "/recommend", "what would you recommend", "architecture advice", "knowledge system for".
+description: Get research-backed architecture advice for your knowledge system. Describe your use case, constraints, and goals — get specific recommendations grounded in TFT research with rationale for each decision. Triggers on "/arscontexta:recommend", "what would you recommend", "architecture advice", "knowledge system for".
 version: "1.0"
 generated_from: "arscontexta-v1.6"
 user-invocable: true
@@ -49,17 +49,17 @@ Parse immediately:
 
 **Advisory, not generative.**
 
-/recommend exists for exploration. The user is considering a knowledge system — maybe they have a use case, maybe they're comparing approaches, maybe they're curious what the research says about a specific pattern. /recommend answers with specific, research-backed reasoning without creating any files.
+/arscontexta:recommend exists for exploration. The user is considering a knowledge system — maybe they have a use case, maybe they're comparing approaches, maybe they're curious what the research says about a specific pattern. /arscontexta:recommend answers with specific, research-backed reasoning without creating any files.
 
-This is the entry point before commitment. /setup generates a full system. /recommend sketches what that system would look like and WHY, so the user can decide whether to proceed. Every recommendation traces to specific research claims. "I recommend X" is never enough — "I recommend X because [[claim]]" is the minimum.
+This is the entry point before commitment. /arscontexta:setup generates a full system. /arscontexta:recommend sketches what that system would look like and WHY, so the user can decide whether to proceed. Every recommendation traces to specific research claims. "I recommend X" is never enough — "I recommend X because [[claim]]" is the minimum.
 
 **The relationship to other skills:**
-- **/recommend** → advisory sketch (no files)
-- **/setup** → full system generation (creates everything)
-- **/architect** → evolution advice for EXISTING systems (reads current state)
-- **/refactor** → implements changes to EXISTING systems (modifies files)
+- **/arscontexta:recommend** → advisory sketch (no files)
+- **/arscontexta:setup** → full system generation (creates everything)
+- **/arscontexta:architect** → evolution advice for EXISTING systems (reads current state)
+- **/arscontexta:refactor** → implements changes to EXISTING systems (modifies files)
 
-/recommend is the only one that works without an existing system. It's pure reasoning from research.
+/arscontexta:recommend is the only one that works without an existing system. It's pure reasoning from research.
 
 ---
 
@@ -398,7 +398,7 @@ Key claims supporting this recommendation:
   - [claim title] — [how it applies]
   - [claim title] — [how it applies]
 
-Ready to build this? Run /setup to generate the full system.
+Ready to build this? Run /arscontexta:setup to generate the full system.
 ```
 
 ### Rationale Depth Per Dimension
@@ -471,7 +471,7 @@ provided enough context]
 - Recommending maximum everything (all dimensions at highest complexity)
 - Recommending without reading the constraint map (producing invalid combinations)
 - Asking more than 2 clarifying questions (analysis paralysis)
-- Generating files (this is /setup's job, not /recommend's)
+- Generating files (this is /arscontexta:setup's job, not /arscontexta:recommend's)
 - Ignoring the user's stated pain points
 - Recommending against the user's explicit preferences without strong research justification
 
@@ -484,9 +484,9 @@ provided enough context]
 If the user already has a system and wants advice on improving it:
 
 ```
-You already have a system. /recommend designs new systems from scratch.
+You already have a system. /arscontexta:recommend designs new systems from scratch.
 
-For evolution advice on existing systems, run /architect — it reads your
+For evolution advice on existing systems, run /arscontexta:architect — it reads your
 current configuration and recommends evidence-based changes.
 
 If you want to compare your current setup against the research-optimal
@@ -500,11 +500,11 @@ If they say yes, proceed with comparison: their current configuration vs what re
 If the request is not about a knowledge system (e.g., "recommend a database for my app"):
 
 ```
-/recommend is designed for knowledge system architecture — personal or
+/arscontexta:recommend is designed for knowledge system architecture — personal or
 agent-operated systems for capturing, organizing, and retrieving knowledge.
 
 Your request sounds more like [what it sounds like]. I can help with
-that directly, but /recommend's research backing is specific to knowledge
+that directly, but /arscontexta:recommend's research backing is specific to knowledge
 management patterns.
 ```
 

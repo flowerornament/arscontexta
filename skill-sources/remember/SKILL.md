@@ -1,6 +1,6 @@
 ---
 name: remember
-description: Capture friction as methodology notes. Three modes — explicit description, contextual (review recent corrections), session mining (scan transcripts for patterns). Triggers on "/remember", "/remember [description]".
+description: Capture friction as methodology notes. Three modes — explicit description, contextual (review recent corrections), session mining (scan transcripts for patterns). Triggers on "/arscontexta:remember", "/arscontexta:remember [description]".
 version: "1.0"
 generated_from: "arscontexta-v1.6"
 user-invocable: true
@@ -17,7 +17,7 @@ Read these files to configure domain-specific behavior:
    - Use `vocabulary.notes` for the notes folder name
    - Use `vocabulary.note` for the note type name in output
    - Use `vocabulary.rethink` for rethink command name in threshold alerts
-   - Use `vocabulary.topic_map` for MOC references
+   - Use `vocabulary.topic_map` for topic map references
 
 2. **`ops/config.yaml`** — thresholds
    - `self_evolution.observation_threshold` (default: 10) — for threshold alerts
@@ -42,7 +42,7 @@ Parse immediately:
 
 ## Explicit Mode
 
-User provides a description: `/remember "don't process personal notes like research"` or `/remember always check for duplicates before creating`
+User provides a description: `/arscontexta:remember "don't process personal notes like research"` or `/arscontexta:remember always check for duplicates before creating`
 
 ### Step 1: Parse the Friction
 
@@ -85,7 +85,7 @@ For each existing note, check if it covers the same behavioral area. Specificall
 
 Write to `ops/methodology/`:
 
-**Rule Zero:** This methodology note becomes part of the system's canonical specification. ops/methodology/ is not a log of what happened — it is the authoritative declaration of how the system should behave. Write this note as a directive: what the agent SHOULD do, not what went wrong. Future sessions, /rethink drift checks, and meta-skills will consult this note as ground truth for system behavior.
+**Rule Zero:** This methodology note becomes part of the system's canonical specification. ops/methodology/ is not a log of what happened — it is the authoritative declaration of how the system should behave. Write this note as a directive: what the agent SHOULD do, not what went wrong. Future sessions, /arscontexta:rethink drift checks, and meta-skills will consult this note as ground truth for system behavior.
 
 **Filename:** Convert the prose title to kebab-case. Example: "don't process personal notes like research" becomes `dont-process-personal-notes-like-research.md`.
 
@@ -128,7 +128,7 @@ Related: [[methodology]]
 - State both the DO and the DON'T — methodology notes that only say what to do miss the anti-pattern that triggered them
 - Keep scope explicit — unbounded methodology notes get applied where they should not be
 
-### Step 4: Update Methodology MOC
+### Step 4: Update Methodology topic map
 
 Edit `ops/methodology.md` (create if missing):
 
@@ -151,12 +151,12 @@ Count methodology notes in the same category:
 grep -rl "^category: [CATEGORY]" ops/methodology/ 2>/dev/null | wc -l | tr -d ' '
 ```
 
-If 3+ notes exist in the same category, this is a signal for /{DOMAIN:rethink}:
+If 3+ notes exist in the same category, this is a signal for /rethink:
 
 ```
 This is friction capture #[N] in the "[category]" area.
 3+ captures in the same area suggest a systemic pattern.
-Consider running /{DOMAIN:rethink} to review [category] methodology patterns
+Consider running /arscontexta:rethink to review [category] methodology patterns
 and potentially elevate them to context file changes.
 ```
 
@@ -167,19 +167,19 @@ and potentially elevate them to context file changes.
 
   Captured: [brief description of the learning]
   Filed to: ops/methodology/[filename].md
-  Updated: ops/methodology.md MOC
+  Updated: ops/methodology.md topic map
   Category: [category]
 
   [If pattern threshold reached:]
   This is friction capture #[N] in the "[category]" area.
-  Consider running /{DOMAIN:rethink} to review [category] methodology patterns.
+  Consider running /arscontexta:rethink to review [category] methodology patterns.
 ```
 
 ---
 
 ## Contextual Mode
 
-No argument provided: `/remember`
+No argument provided: `/arscontexta:remember`
 
 The agent reviews the current conversation to find corrections the user made that should become methodology notes.
 
@@ -246,17 +246,17 @@ If the conversation contains more than one correction:
   No recent corrections detected in this conversation.
 
   Options:
-  - /remember "description" — capture specific friction with explicit text
-  - /remember --mine-sessions — scan session transcripts for uncaptured patterns
+  - /arscontexta:remember "description" — capture specific friction with explicit text
+  - /arscontexta:remember --mine-sessions — scan session transcripts for uncaptured patterns
 ```
 
 ---
 
 ## Session Mining Mode
 
-Flag provided: `/remember --mine-sessions` or `/remember --mine`
+Flag provided: `/arscontexta:remember --mine-sessions` or `/arscontexta:remember --mine`
 
-This mode scans stored session transcripts for friction patterns the user addressed during work but did not explicitly `/remember`.
+This mode scans stored session transcripts for friction patterns the user addressed during work but did not explicitly `/arscontexta:remember`.
 
 ### Step 1: Find Unmined Sessions
 
@@ -362,37 +362,37 @@ Use Edit tool to add `mined: true` after the existing frontmatter fields. Do not
 
   [If pattern thresholds reached:]
   Category "[category]" now has [N] methodology notes.
-  Consider running /{DOMAIN:rethink} to review [category] patterns.
+  Consider running /arscontexta:rethink to review [category] patterns.
 ```
 
 ---
 
 ## The Methodology Learning Loop
 
-This is the complete cycle that /remember participates in:
+This is the complete cycle that /arscontexta:remember participates in:
 
 ```
 Work happens
   → user corrects agent behavior (explicit or implicit)
-  → /remember captures correction as methodology note
+  → /arscontexta:remember captures correction as methodology note
   → methodology note filed to ops/methodology/
   → agent reads methodology notes at session start (via context file reference)
   → agent behavior improves
   → fewer corrections needed
   → when methodology notes accumulate (3+ in same category)
-  → /rethink triages and detects patterns
+  → /arscontexta:rethink triages and detects patterns
   → patterns elevated to context file changes
   → system methodology evolves at the architectural level
   → the cycle continues with new friction at the edges
 ```
 
 Each layer of this loop serves a different purpose:
-- **/remember** captures individual friction points — fast, low ceremony
+- **/arscontexta:remember** captures individual friction points — fast, low ceremony
 - **ops/methodology/** stores accumulated behavioral guidance — persists across sessions
-- **/rethink** detects patterns and proposes structural changes — periodic, deliberate
+- **/arscontexta:rethink** detects patterns and proposes structural changes — periodic, deliberate
 - **ops/context.md** (or equivalent) embodies the system's stable methodology — changes rarely, by human approval
 
-The loop is healthy when methodology notes accumulate slowly (friction is being addressed) and /rethink elevates patterns to context-level changes when thresholds are exceeded.
+The loop is healthy when methodology notes accumulate slowly (friction is being addressed) and /arscontexta:rethink elevates patterns to context-level changes when thresholds are exceeded.
 
 The loop is unhealthy when the same category keeps getting methodology notes without elevation (the system is capturing friction but not learning from it).
 
@@ -403,14 +403,14 @@ The methodology folder is more than a friction capture log. It is the system's a
 **What this means for /remember:**
 - Every methodology note you create becomes part of the spec. Write directives, not incident reports.
 - The title should be an actionable behavior ("check for semantic duplicates before creating any note") not a problem description ("duplicate creation issue").
-- Future /rethink sessions will compare system behavior against what methodology notes declare. Vague notes create unmeasurable specs.
+- Future /arscontexta:rethink sessions will compare system behavior against what methodology notes declare. Vague notes create unmeasurable specs.
 
 **What this means for the system:**
-- ops/methodology/ is consulted by meta-skills (/ask, /architect, /rethink) as the source of truth for how the system works.
+- ops/methodology/ is consulted by meta-skills (/arscontexta:ask, /arscontexta:architect, /arscontexta:rethink) as the source of truth for how the system works.
 - Drift detection compares methodology note assertions against actual config.yaml and context file state.
 - When methodology notes are stale (older than config changes), the system surfaces this as a maintenance condition.
 
-The methodology folder is the spec. /remember writes the spec. /rethink enforces the spec. The loop is closed.
+The methodology folder is the spec. /arscontexta:remember writes the spec. /arscontexta:rethink enforces the spec. The loop is closed.
 
 ---
 
@@ -443,10 +443,10 @@ Choose the most specific applicable category:
 
 | Category | Use When |
 |----------|---------|
-| processing | Friction during /reduce, extraction, claim creation |
+| processing | Friction during /arscontexta:extract, extraction, claim creation |
 | capture | Friction during inbox filing, raw material handling |
-| connection | Friction during /reflect, link evaluation, MOC updates |
-| maintenance | Friction during /reweave, health checks, cleanup |
+| connection | Friction during /arscontexta:connect, link evaluation, topic map updates |
+| maintenance | Friction during /arscontexta:reweave, health checks, cleanup |
 | voice | Friction about writing style, tone, output formatting |
 | behavior | Friction about general agent conduct, interaction patterns, tool usage |
 | quality | Friction about note quality, description writing, title crafting |
@@ -459,7 +459,7 @@ If a friction point spans categories (e.g., "processing voice" or "capture quali
 
 ### No ops/methodology/ Directory
 
-Create it and the `ops/methodology.md` MOC:
+Create it and the `ops/methodology.md` topic map:
 
 ```markdown
 ---
@@ -500,7 +500,7 @@ If the new friction CONTRADICTS an existing methodology note (user now wants the
 1. Create an observation in `ops/observations/` documenting the contradiction
 2. Update the existing methodology note's status to `superseded` and add `superseded_by: [new note]`
 3. Create the new methodology note with the updated guidance
-4. Report the contradiction and suggest /rethink if this is part of a broader pattern
+4. Report the contradiction and suggest /arscontexta:rethink if this is part of a broader pattern
 
 ### No Sessions to Mine
 
@@ -530,5 +530,5 @@ In contextual mode with no conversation history (e.g., first message of a sessio
 --=={ remember — contextual }==--
 
   No conversation context available to analyze.
-  Use /remember "description" to capture specific friction directly.
+  Use /arscontexta:remember "description" to capture specific friction directly.
 ```

@@ -1,12 +1,13 @@
 ---
 name: ask
-description: Query the bundled research knowledge graph for methodology guidance. Routes questions through a 3-tier knowledge base — WHY (research claims), HOW (guidance docs), WHAT IT LOOKS LIKE (domain examples) — plus structured reference documents. Returns research-backed answers grounded in specific claims with practical application to the user's system. Triggers on "/ask", "/ask [question]", "why does my system...", "how should I...".
+description: Query the bundled research knowledge graph for methodology guidance. Routes questions through a 3-tier knowledge base — WHY (research claims), HOW (guidance docs), WHAT IT LOOKS LIKE (domain examples) — plus structured reference documents. Returns research-backed answers grounded in specific claims with practical application to the user's system. Triggers on "/arscontexta:ask", "/arscontexta:ask [question]", "why does my system...", "how should I...".
 version: "1.0"
 generated_from: "arscontexta-v1.6"
 context: fork
 model: opus
 allowed-tools: Read, Grep, Glob, mcp__qmd__search, mcp__qmd__vector_search, mcp__qmd__deep_search, mcp__qmd__get, mcp__qmd__multi_get
 argument-hint: "[question about knowledge systems or methodology]"
+user-invocable: true
 ---
 
 ## EXECUTE NOW
@@ -307,8 +308,8 @@ Every answer follows this structure:
 > The reason is [[context quality degrades as conversation grows]] — your extraction quality in the later sections of a 3000-line document will be measurably worse than in the early sections. Fresh context per chunk ensures each section gets your best attention.
 >
 > **Practical steps:**
-> 1. Run /seed to create the extraction task
-> 2. /reduce will automatically detect the source size and plan chunks
+> 1. Run /arscontexta:seed to create the extraction task
+> 2. /arscontexta:extract will automatically detect the source size and plan chunks
 > 3. Each chunk extracts independently with a running duplicate list across chunks
 > 4. The final extraction report covers all chunks combined
 >

@@ -5,6 +5,7 @@ context: fork
 model: opus
 allowed-tools: Read, Write, Edit, Grep, Glob, Bash, mcp__qmd__search, mcp__qmd__vector_search, mcp__qmd__deep_search, mcp__qmd__get, mcp__qmd__multi_get, AskUserQuestion
 argument-hint: "[optional: --analysis-only to see drift report without implementing]"
+user-invocable: true
 ---
 
 You are the Ars Contexta re-derivation engine. Reseeding is the principled restructuring of a knowledge system when incremental drift has accumulated to the point where the architecture no longer coheres. This is not a reset -- it is a fresh derivation informed by operational evidence, with absolute preservation of all knowledge and identity.
@@ -42,7 +43,7 @@ Read these during the re-derivation phases:
 
 ## When to Reseed
 
-Reseeding is a significant operation. It should be recommended (by `/architect` or `/health`) when incremental fixes are no longer sufficient:
+Reseeding is a significant operation. It should be recommended (by `/arscontexta:architect` or `/arscontexta:health`) when incremental fixes are no longer sufficient:
 
 - **Dimension incoherence spans >3 dimensions** -- too many cascading mismatches for targeted fixes
 - **Vocabulary no longer matches user's language** -- the system speaks a dialect the user has outgrown
@@ -50,7 +51,7 @@ Reseeding is a significant operation. It should be recommended (by `/architect` 
 - **Template divergence >40%** -- actual note schemas have drifted far from templates
 - **MOC hierarchy no longer reflects actual topic structure** -- navigation is more hindrance than help
 
-If none of these triggers are present, recommend `/architect` for targeted evolution instead.
+If none of these triggers are present, recommend `/arscontexta:architect` for targeted evolution instead.
 
 ---
 

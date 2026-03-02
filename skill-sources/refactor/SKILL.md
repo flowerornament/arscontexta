@@ -1,6 +1,6 @@
 ---
 name: refactor
-description: Plan vault restructuring from config changes. Compares config.yaml against derivation.md, identifies dimension shifts, shows restructuring plan, executes on approval. Triggers on "/refactor", "restructure vault".
+description: Plan vault restructuring from config changes. Compares config.yaml against derivation.md, identifies dimension shifts, shows restructuring plan, executes on approval. Triggers on "/arscontexta:refactor", "restructure vault".
 version: "1.0"
 generated_from: "arscontexta-v1.6"
 user-invocable: true
@@ -16,7 +16,7 @@ Read these files to configure domain-specific behavior:
 1. **`ops/derivation-manifest.md`** — vocabulary mapping, dimension positions, platform hints
    - Use `vocabulary.notes` for the notes folder name
    - Use `vocabulary.note` / `vocabulary.note_plural` for note type references
-   - Use `vocabulary.topic_map` / `vocabulary.topic_map_plural` for MOC references
+   - Use `vocabulary.topic_map` / `vocabulary.topic_map_plural` for topic map references
    - Use `vocabulary.inbox` for the inbox folder name
 
 2. **`ops/config.yaml`** — current live configuration (the "after" state)
@@ -29,7 +29,7 @@ If these files don't exist, report error: "Cannot refactor without both ops/conf
 
 ## EXECUTE NOW
 
-**INVARIANT: /refactor never executes without approval.** The plan is always shown first.
+**INVARIANT: /arscontexta:refactor never executes without approval.** The plan is always shown first.
 
 **Target: $ARGUMENTS**
 
@@ -54,11 +54,11 @@ Parse immediately:
 
 **Configuration changes cascade.**
 
-Changing a dimension is not just editing a value in config.yaml. Each dimension affects multiple artifacts — skills, templates, context file sections, hooks, MOC structure. Changing organization from "flat" to "hierarchical" means restructuring the notes directory, updating MOC templates, adjusting navigation references in the context file, and regenerating skills that reference folder structure.
+Changing a dimension is not just editing a value in config.yaml. Each dimension affects multiple artifacts — skills, templates, context file sections, hooks, topic map structure. Changing organization from "flat" to "hierarchical" means restructuring the notes directory, updating topic map templates, adjusting navigation references in the context file, and regenerating skills that reference folder structure.
 
-/refactor makes these cascades visible and manages them. Without it, dimension changes create drift: config says one thing, artifacts say another. With it, every change is planned, approved, and validated.
+/arscontexta:refactor makes these cascades visible and manages them. Without it, dimension changes create drift: config says one thing, artifacts say another. With it, every change is planned, approved, and validated.
 
-**The relationship to /architect:** /architect RECOMMENDS changes. /refactor IMPLEMENTS them. /architect analyzes health and friction to propose dimension shifts. When those proposals are approved, /refactor ensures every affected artifact is updated consistently.
+**The relationship to /architect:** /arscontexta:architect RECOMMENDS changes. /arscontexta:refactor IMPLEMENTS them. /arscontexta:architect analyzes health and friction to propose dimension shifts. When those proposals are approved, /arscontexta:refactor ensures every affected artifact is updated consistently.
 
 ---
 
@@ -104,8 +104,8 @@ If no changes detected:
   No configuration drift detected between config.yaml and derivation.md.
   All dimensions and features match the original derivation.
 
-  If you want to explore changes, run /architect for recommendations
-  or edit ops/config.yaml directly, then run /refactor again.
+  If you want to explore changes, run /arscontexta:architect for recommendations
+  or edit ops/config.yaml directly, then run /arscontexta:refactor again.
 ```
 
 ---
@@ -118,13 +118,13 @@ For each changed dimension, determine ALL affected artifacts. This is the cascad
 
 | Change | Affected Artifacts | What Changes |
 |--------|-------------------|-------------|
-| **Granularity shift** | Note templates, extraction depth in /reduce, processing skills, context file "Note Design" section | Template body length guidance, extraction granularity settings, composability test thresholds |
-| **Organization shift** | Folder structure, MOC hierarchy, context file "Folder Architecture" section, hub MOC | Directory layout, MOC tier count, navigation references |
-| **Linking shift** | Semantic search config, /reflect connection density expectations, context file "Connection Finding" section | Search tool availability, link threshold values, discovery layer instructions |
-| **Processing shift** | /reduce depth settings, /reflect pass count, pipeline skills, context file "Processing Pipeline" section, config.yaml processing.depth | Extraction thoroughness, connection evaluation depth, chaining mode |
-| **Navigation shift** | MOC tier structure, hub MOC, context file "MOC" section, note Topics footers | Number of MOC tiers, hub content, navigation instructions |
-| **Maintenance shift** | /health threshold values, condition-based trigger settings, context file maintenance instructions | Check frequency conditions, stale note thresholds, reweave trigger conditions |
-| **Schema shift** | Templates (_schema blocks), validation rules, /validate skill, query scripts, context file "YAML" section | Required fields, enum values, validation patterns |
+| **Granularity shift** | Note templates, extraction depth in /arscontexta:extract, processing skills, context file "Note Design" section | Template body length guidance, extraction granularity settings, composability test thresholds |
+| **Organization shift** | Folder structure, topic map hierarchy, context file "Folder Architecture" section, hub topic map | Directory layout, topic map tier count, navigation references |
+| **Linking shift** | Semantic search config, /arscontexta:connect connection density expectations, context file "Connection Finding" section | Search tool availability, link threshold values, discovery layer instructions |
+| **Processing shift** | /arscontexta:extract depth settings, /arscontexta:connect pass count, pipeline skills, context file "Processing Pipeline" section, config.yaml processing.depth | Extraction thoroughness, connection evaluation depth, chaining mode |
+| **Navigation shift** | topic map tier structure, hub topic map, context file "topic map" section, note Topics footers | Number of topic map tiers, hub content, navigation instructions |
+| **Maintenance shift** | /arscontexta:health threshold values, condition-based trigger settings, context file maintenance instructions | Check frequency conditions, stale note thresholds, reweave trigger conditions |
+| **Schema shift** | Templates (_schema blocks), validation rules, /arscontexta:validate skill, query scripts, context file "YAML" section | Required fields, enum values, validation patterns |
 | **Automation shift** | Hooks (session orient, write validation, inbox processing), skill activation, config.yaml automation section | Which hooks are active, automation level references |
 
 ### Artifact Analysis Format
@@ -143,18 +143,18 @@ Artifact: [file path]
 
 ### Content Impact Assessment
 
-Some changes affect only infrastructure (skills, templates, context file). Others affect existing content (notes, MOCs):
+Some changes affect only infrastructure (skills, templates, context file). Others affect existing content (notes, topic maps):
 
 | Change Type | Content Impact | Action Required |
 |-------------|---------------|----------------|
 | Template field addition | New notes get field, old notes don't | Add field to old notes (schema migration) |
 | Template field removal | Old notes have unused field | Remove field from old notes (optional) |
 | Folder restructure | Notes must move | Move files, update all wiki links |
-| MOC tier change | MOC hierarchy restructured | Merge/split MOCs, update Topics footers |
+| topic map tier change | topic map hierarchy restructured | Merge/split topic maps, update Topics footers |
 | Enum value change | Old notes have invalid values | Update values in affected notes |
 
 For content-impacting changes:
-- Count affected notes: `grep -rl '[old value]' {vocabulary.notes}/*.md | wc -l`
+- Count affected notes: `grep -rl '[old value]' notes/*.md | wc -l`
 - List specific files that need updating
 - Estimate time for content migration
 
@@ -188,7 +188,7 @@ Detected [N] dimension changes:
     Affects:
     - [artifact 1]: [specific change]
     - [artifact 2]: [specific change]
-    Content impact: [N] existing {vocabulary.note_plural} need [what]
+    Content impact: [N] existing claims need [what]
     Risk: [low/medium/high]
 
   [dimension]: [old] -> [new]
@@ -233,7 +233,7 @@ Before making changes, record the current state for rollback reference:
 ```bash
 # Log what is about to change
 DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
-echo "## $DATE: /refactor — [dimensions changed]" >> ops/changelog.md
+echo "## $DATE: /arscontexta:refactor — [dimensions changed]" >> ops/changelog.md
 echo "" >> ops/changelog.md
 echo "Changes planned:" >> ops/changelog.md
 echo "[list of changes]" >> ops/changelog.md
@@ -253,13 +253,13 @@ For each skill affected by the dimension changes:
 
 | Dimension Change | Skills to Regenerate |
 |-----------------|---------------------|
-| Granularity | /reduce, /verify, /validate |
-| Processing | /reduce, /reflect, /reweave, /verify, /ralph, /pipeline |
-| Linking | /reflect, /reweave |
-| Navigation | /reflect (MOC update logic) |
-| Schema | /validate, /verify |
-| Automation | /ralph, /pipeline (chaining mode) |
-| Maintenance | /health |
+| Granularity | /arscontexta:extract, /arscontexta:verify, /arscontexta:validate |
+| Processing | /arscontexta:extract, /arscontexta:connect, /arscontexta:reweave, /arscontexta:verify, /arscontexta:ralph, /arscontexta:pipeline |
+| Linking | /arscontexta:connect, /arscontexta:reweave |
+| Navigation | /arscontexta:connect (topic map update logic) |
+| Schema | /arscontexta:validate, /arscontexta:verify |
+| Automation | /arscontexta:ralph, /arscontexta:pipeline (chaining mode) |
+| Maintenance | /arscontexta:health |
 
 ### 4c. Update Context File
 
@@ -294,7 +294,7 @@ After all changes are applied:
    - New dimension positions
    - Rationale for each change
    - Date of change
-   - Reference to /architect recommendation (if applicable)
+   - Reference to /arscontexta:architect recommendation (if applicable)
 
 2. Update `ops/derivation-manifest.md` to sync machine-readable config
 
@@ -307,7 +307,7 @@ If Phase 2 identified content-impacting changes:
 1. **Schema migration:** Add/remove/rename fields across notes
    ```bash
    # Example: add a new required field to all notes
-   for f in {vocabulary.notes}/*.md; do
+   for f in notes/*.md; do
      grep -q '^new_field:' "$f" || sed -i '' '/^description:/a\
    new_field: [default value]' "$f"
    done
@@ -325,9 +325,9 @@ If Phase 2 identified content-impacting changes:
    ops/scripts/rename-note.sh "old name" "new name"
    ```
 
-4. **MOC restructuring:** Merge/split MOCs as needed
-   - For splits: create sub-MOCs, move Core Ideas, update parent
-   - For merges: combine Core Ideas, remove redundant MOC, update notes' Topics footers
+4. **topic map restructuring:** Merge/split topic maps as needed
+   - For splits: create sub-topic maps, move Core Ideas, update parent
+   - For merges: combine Core Ideas, remove redundant topic map, update notes' Topics footers
 
 ---
 
@@ -341,7 +341,7 @@ Run kernel validation to confirm nothing broke:
 |-------|-----|----------------|
 | Wiki link resolution | Scan for all `[[X]]` and verify X.md exists | Zero dangling links |
 | Schema compliance | Check all notes against template _schema blocks | All required fields present, enum values valid |
-| MOC hierarchy | Verify hub links to domain MOCs, domains link to topics | All tiers connected |
+| topic map hierarchy | Verify hub links to domain topic maps, domains link to topics | All tiers connected |
 | Session orient | Simulate session start — can the context file be loaded? | No file-not-found errors |
 | Three-space boundaries | Check notes vs ops vs self boundaries | No content in wrong space |
 | Vocabulary consistency | Check that skills and context file use updated vocabulary | No stale universal terms |
@@ -357,9 +357,9 @@ Run kernel validation to confirm nothing broke:
     [dimension]: [old] -> [new] — [N] artifacts updated
 
   Content migration:
-    [N] {vocabulary.note_plural} updated with new schema fields
+    [N] claims updated with new schema fields
     [N] wiki links updated
-    [N] {vocabulary.topic_map_plural} restructured
+    [N] topic maps restructured
 
   Kernel validation: [N]/[N] checks PASS
   [Any warnings or issues]
@@ -390,7 +390,7 @@ Cannot run /refactor: [missing file] not found.
   - ops/derivation.md is the original design baseline
   Both are required to detect dimension shifts.
 
-  Run /setup to create a new system, or manually create the missing file.
+  Run /arscontexta:setup to create a new system, or manually create the missing file.
 ```
 
 ### Single Dimension Focus
@@ -414,7 +414,7 @@ If an interaction constraint hard block is detected:
   Recommended: Either change [dimension X] back to [safe value] or also change
   [dimension Y] to [compensating value].
 
-  Cannot proceed with current configuration. Adjust and re-run /refactor.
+  Cannot proceed with current configuration. Adjust and re-run /arscontexta:refactor.
 ```
 
 Do NOT proceed with restructuring when a hard block is active.
@@ -440,7 +440,7 @@ Handle each feature flag change specifically:
 | semantic_search | Remove search references from skills, update context file | Add search config, update skills with search integration |
 | self_space | Archive self/ contents, remove self/ references | Create self/ structure, generate identity files |
 | session_capture | INVARIANT — cannot disable | Already on (invariant) |
-| parallel_workers | Update /ralph to serial-only mode | Verify tmux available, update /ralph for parallel mode |
+| parallel_workers | Update /arscontexta:ralph to serial-only mode | Verify tmux available, update /arscontexta:ralph for parallel mode |
 
 ### No ops/derivation-manifest.md
 

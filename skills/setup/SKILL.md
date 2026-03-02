@@ -1,10 +1,11 @@
 ---
 name: setup
-description: Scaffold a complete knowledge system. Detects platform, conducts conversation, derives configuration, generates everything. Validates against 15 kernel primitives. Triggers on "/setup", "/setup --advanced", "set up my knowledge system", "create my vault".
+description: Scaffold a complete knowledge system. Detects platform, conducts conversation, derives configuration, generates everything. Validates against 15 kernel primitives. Triggers on "/arscontexta:setup", "/arscontexta:setup --advanced", "set up my knowledge system", "create my vault".
 context: fork
 model: sonnet
 allowed-tools: Read, Write, Edit, Bash, Glob, Grep, AskUserQuestion
 argument-hint: "[--advanced for upfront dimension configuration]"
+user-invocable: true
 ---
 
 You are the Ars Contexta derivation engine. You are about to create someone's cognitive architecture. This is the single most important interaction in the product. Get it right and they have a thinking partner for years. Get it wrong and they have a folder of templates they will abandon in a week.
@@ -167,7 +168,7 @@ Dimensions default to opinionated best practices and are NOT interrogated during
 | Schema | Moderate |
 | Automation | Full |
 
-The conversation focuses on understanding the user's domain and needs. Users adjust dimensions post-init via `ops/config.yaml` or by running `/setup --advanced` for upfront configuration.
+The conversation focuses on understanding the user's domain and needs. Users adjust dimensions post-init via `ops/config.yaml` or by running `/arscontexta:setup --advanced` for upfront configuration.
 
 **If running in --advanced mode:** After the opening conversation, present the 8 dimensions with recommended positions based on extracted signals. Allow the user to adjust each dimension. Then proceed with the adjusted configuration.
 
@@ -450,7 +451,7 @@ Structure the proposal as:
 2. Folder structure with their domain-named directories
 3. How their notes work -- with a specific example from their domain using their vocabulary
 4. How processing works, described in their words
-5. How self-knowledge works — "Your system maintains its own methodology in ops/methodology/. Use /ask to query the 249-note methodology knowledge base backing your design, or browse ops/methodology/ directly."
+5. How self-knowledge works — "Your system maintains its own methodology in ops/methodology/. Use /arscontexta:ask to query the 249-note methodology knowledge base backing your design, or browse ops/methodology/ directly."
 6. Agent personality description (if personality was derived; otherwise skip)
 7. What was intentionally excluded and why
 8. Any high-risk failure modes flagged
@@ -575,8 +576,8 @@ engine_version: "1.0.0"
 
 This file serves three purposes:
 1. **Immediate:** Source of truth for all subsequent generation steps (context resilience)
-2. **Operational:** Enables `/architect` to reason about configuration drift
-3. **Evolution:** Enables `/reseed` to re-derive with updated understanding
+2. **Operational:** Enables `/arscontexta:architect` to reason about configuration drift
+3. **Evolution:** Enables `/arscontexta:reseed` to re-derive with updated understanding
 
 ---
 
@@ -806,9 +807,9 @@ This folder records what the system knows about its own operation — why it was
 Browse notes: `ls ops/methodology/`
 Query by category: `rg '^category:' ops/methodology/`
 Find active directives: `rg '^status: active' ops/methodology/`
-Ask the research graph: `/ask [question about your system]`
+Ask the research graph: `/arscontexta:ask [question about your system]`
 
-Meta-skills (/{DOMAIN:rethink}, /architect) read from and write to this folder.
+Meta-skills (/{DOMAIN:rethink}, /arscontexta:architect) read from and write to this folder.
 /{DOMAIN:remember} captures operational corrections here.
 ```
 
@@ -862,8 +863,8 @@ Welcome to your {domain} knowledge system. This manual explains how everything w
 - [[getting-started]] — Your first session, first {DOMAIN:note}, and first connection
 - [[skills]] — Every available command with when to use it and examples
 - [[workflows]] — The processing pipeline, maintenance cycle, and session rhythm
-- [[configuration]] — How to adjust settings via config.yaml or /architect
-- [[meta-skills]] — /ask, /architect, /{DOMAIN:rethink}, and /{DOMAIN:remember} explained
+- [[configuration]] — How to adjust settings via config.yaml or /arscontexta:architect
+- [[meta-skills]] — /arscontexta:ask, /arscontexta:architect, /{DOMAIN:rethink}, and /{DOMAIN:remember} explained
 - [[troubleshooting]] — Common issues and how to resolve them
 ```
 
@@ -883,7 +884,7 @@ generated_from: "arscontexta-{version}"
 - How connections work (wiki links, {DOMAIN:topic maps})
 - The orient-work-persist session rhythm
 - Where to go next (link to [[workflows]] and [[skills]])
-- Running /tutorial for an interactive walkthrough
+- Running /arscontexta:tutorial for an interactive walkthrough
 ```
 
 **Page 3: skills.md**
@@ -927,7 +928,7 @@ generated_from: "arscontexta-{version}"
 
 ```markdown
 ---
-description: How to adjust your system via config.yaml and /architect
+description: How to adjust your system via config.yaml and /arscontexta:architect
 type: manual
 generated_from: "arscontexta-{version}"
 ---
@@ -935,11 +936,11 @@ generated_from: "arscontexta-{version}"
 
 {Generate content covering:}
 - config.yaml structure and key fields
-- Using /architect for guided configuration changes
+- Using /arscontexta:architect for guided configuration changes
 - Feature toggling: what can be enabled/disabled
 - Preset explanation: what your preset includes and why
 - Dimension positions and what they mean for your domain
-- Link to [[meta-skills]] for /architect details
+- Link to [[meta-skills]] for /arscontexta:architect details
 - Link to [[troubleshooting]] for configuration issues
 ```
 
@@ -947,15 +948,15 @@ generated_from: "arscontexta-{version}"
 
 ```markdown
 ---
-description: Deep guide to /ask, /architect, /{DOMAIN:rethink}, and /{DOMAIN:remember}
+description: Deep guide to /arscontexta:ask, /arscontexta:architect, /{DOMAIN:rethink}, and /{DOMAIN:remember}
 type: manual
 generated_from: "arscontexta-{version}"
 ---
 # Meta-Skills
 
 {Generate content covering:}
-- /ask — querying the bundled research knowledge base + local methodology
-- /architect — getting research-backed configuration advice
+- /arscontexta:ask — querying the bundled research knowledge base + local methodology
+- /arscontexta:architect — getting research-backed configuration advice
 - /{DOMAIN:rethink} — reviewing accumulated observations and tensions, drift detection
 - /{DOMAIN:remember} — capturing friction and methodology learnings (Rule Zero: methodology as spec)
 - When to use each meta-skill
@@ -982,7 +983,7 @@ generated_from: "arscontexta-{version}"
 - Inbox overflow — too many items accumulating (run /{DOMAIN:process} or /{DOMAIN:pipeline})
 - Pipeline stalls — tasks stuck in queue (check with /{DOMAIN:next})
 - Common mistakes table with corrections
-- Link to [[meta-skills]] for /rethink and /remember
+- Link to [[meta-skills]] for /arscontexta:rethink and /arscontexta:remember
 - Link to [[configuration]] for threshold adjustments
 ```
 
@@ -1091,7 +1092,7 @@ research:
 2. If Exa web search available (`mcp__exa__web_search_exa`): fallback = exa-web-search
 3. Web search is always the last resort
 
-**Relationship:** config.yaml is the live operational config. derivation.md is the historical record of WHY. Config can drift; `/architect` detects and documents the drift.
+**Relationship:** config.yaml is the live operational config. derivation.md is the historical record of WHY. Config can drift; `/arscontexta:architect` detects and documents the drift.
 
 ---
 
@@ -1099,11 +1100,11 @@ research:
 
 **Re-read `ops/derivation.md`** for all dimension positions, vocabulary mapping, active blocks, and platform information.
 
-Generate the machine-readable derivation manifest. This is the KEY file that enables runtime vocabulary transformation for all inherited processing skills (/reduce, /reflect, /reweave, /verify, /validate). Skills read this file at invocation time to apply domain-specific vocabulary without needing domain-specific skill copies.
+Generate the machine-readable derivation manifest. This is the KEY file that enables runtime vocabulary transformation for all inherited processing skills (/arscontexta:extract, /arscontexta:connect, /arscontexta:reweave, /arscontexta:verify, /arscontexta:validate). Skills read this file at invocation time to apply domain-specific vocabulary without needing domain-specific skill copies.
 
 ```yaml
 # ops/derivation-manifest.md -- Machine-readable manifest for runtime skill configuration
-# Generated by /setup. Updated by /reseed, /architect, /add-domain.
+# Generated by /arscontexta:setup. Updated by /arscontexta:reseed, /arscontexta:architect, /arscontexta:add-domain.
 ---
 engine_version: "0.2.0"
 research_snapshot: "2026-02-10"
@@ -1155,11 +1156,11 @@ vocabulary:
   rethink: "[domain term]"      # e.g., "rethink", "reassess", "retrospect"
 
   # Level 6: Command names (as users invoke them)
-  cmd_reduce: "[/domain-verb]"  # e.g., "/reduce", "/surface", "/document"
-  cmd_reflect: "[/domain-verb]" # e.g., "/reflect", "/find-patterns", "/link-decisions"
-  cmd_reweave: "[/domain-verb]" # e.g., "/reweave", "/revisit", "/update-old"
-  cmd_verify: "[/domain-verb]"  # e.g., "/verify", "/check", "/audit"
-  cmd_rethink: "[/domain-verb]" # e.g., "/rethink", "/reassess", "/retrospect"
+  cmd_reduce: "[/domain-verb]"  # e.g., "/arscontexta:extract", "/surface", "/document"
+  cmd_reflect: "[/domain-verb]" # e.g., "/arscontexta:connect", "/find-patterns", "/link-decisions"
+  cmd_reweave: "[/domain-verb]" # e.g., "/arscontexta:reweave", "/revisit", "/update-old"
+  cmd_verify: "[/domain-verb]"  # e.g., "/arscontexta:verify", "/check", "/audit"
+  cmd_rethink: "[/domain-verb]" # e.g., "/arscontexta:rethink", "/reassess", "/retrospect"
 
   # Level 7: Extraction categories (domain-specific, from conversation)
   extraction_categories:
@@ -1194,10 +1195,10 @@ personality:
 **Why this file exists separately from derivation.md:** derivation.md is the human-readable reasoning record (WHY each choice was made, conversation signals, confidence levels). derivation-manifest.md is the machine-readable operational manifest (WHAT the choices are). Skills read the manifest for quick vocabulary lookup without parsing the narrative derivation document.
 
 **Who updates this file:**
-- `/setup` generates it
-- `/reseed` regenerates it after re-derivation
-- `/architect` updates it when implementing approved changes
-- `/add-domain` extends it with new domain vocabulary
+- `/arscontexta:setup` generates it
+- `/arscontexta:reseed` regenerates it after re-derivation
+- `/arscontexta:architect` updates it when implementing approved changes
+- `/arscontexta:add-domain` extends it with new domain vocabulary
 
 ---
 
@@ -1273,8 +1274,8 @@ The 16 skill sources to install:
 
 | Source Directory | Skill Name | Category |
 |-----------------|------------|----------|
-| `${CLAUDE_PLUGIN_ROOT}/skill-sources/reduce/` | reduce | Processing |
-| `${CLAUDE_PLUGIN_ROOT}/skill-sources/reflect/` | reflect | Processing |
+| `${CLAUDE_PLUGIN_ROOT}/skill-sources/arscontexta:extract/` | reduce | Processing |
+| `${CLAUDE_PLUGIN_ROOT}/skill-sources/arscontexta:connect/` | reflect | Processing |
 | `${CLAUDE_PLUGIN_ROOT}/skill-sources/reweave/` | reweave | Processing |
 | `${CLAUDE_PLUGIN_ROOT}/skill-sources/verify/` | verify | Processing |
 | `${CLAUDE_PLUGIN_ROOT}/skill-sources/validate/` | validate | Processing |
@@ -1308,7 +1309,7 @@ Every generated skill must include:
 
 ##### Skill Discoverability Protocol
 
-**Platform limitation:** Claude Code's skill index does not refresh mid-session. Skills created during /setup are not discoverable until the user restarts Claude Code.
+**Platform limitation:** Claude Code's skill index does not refresh mid-session. Skills created during /arscontexta:setup are not discoverable until the user restarts Claude Code.
 
 After creating ALL skill files:
 
@@ -1660,7 +1661,7 @@ Created:
   [hooks configured]
   ops/derivation.md      -- the complete record of how this system was derived
   ops/derivation-manifest.md -- machine-readable config for runtime skills
-  ops/methodology/       -- vault self-knowledge (query with /ask or browse directly)
+  ops/methodology/       -- vault self-knowledge (query with /arscontexta:ask or browse directly)
   ops/config.yaml        -- edit this to adjust dimensions without re-running init
 
 Kernel Validation: [PASS count] / 15 passed

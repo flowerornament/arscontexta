@@ -1,6 +1,6 @@
 ---
 name: ralph
-description: Queue processing with fresh context per phase. Processes N tasks from the queue, spawning isolated subagents to prevent context contamination. Supports serial, parallel, batch filter, and dry run modes. Triggers on "/ralph", "/ralph N", "process queue", "run pipeline tasks".
+description: Queue processing with fresh context per phase. Processes N tasks from the queue, spawning isolated subagents to prevent context contamination. Supports serial, parallel, batch filter, and dry run modes. Triggers on "/arscontexta:ralph", "/arscontexta:ralph N", "process queue", "run pipeline tasks".
 version: "1.0"
 generated_from: "arscontexta-v1.6"
 user-invocable: true
@@ -50,12 +50,12 @@ Each phase maps to specific Task tool parameters. Use these EXACTLY when spawnin
 
 | Phase | Skill Invoked | Purpose |
 |-------|---------------|---------|
-| extract | /reduce | Extract claims from source material |
-| create | (inline note creation) | Write the {DOMAIN:note} file |
-| enrich | /enrich | Add content to existing {DOMAIN:note} |
-| reflect | /reflect | Find connections, update {DOMAIN:topic map}s |
-| reweave | /reweave | Update older {DOMAIN:note_plural} with new connections |
-| verify | /verify | Description quality + schema + health checks |
+| extract | /arscontexta:extract | Extract claims from source material |
+| create | (inline note creation) | Write the claim file |
+| enrich | /enrich | Add content to existing claim |
+| reflect | /arscontexta:connect | Find connections, update topic maps |
+| reweave | /arscontexta:reweave | Update older claims with new connections |
+| verify | /arscontexta:verify | Description quality + schema + health checks |
 
 **All phases use the same subagent configuration:**
 - subagent_type: knowledge-worker (if available) or default
@@ -101,7 +101,7 @@ tasks:
     completed_phases: [create]
 ```
 
-If the queue file does not exist or is empty, report: "Queue is empty. Use /seed or /pipeline to add sources."
+If the queue file does not exist or is empty, report: "Queue is empty. Use /arscontexta:seed or /arscontexta:pipeline to add sources."
 
 ## Step 2: Filter Tasks
 
@@ -175,7 +175,7 @@ Read the task file at ops/queue/{FILE} for context.
 You are processing task {ID} from the work queue.
 Phase: extract | Target: {TARGET}
 
-Run /reduce --handoff on the source file referenced in the task file.
+Run /arscontexta:extract --handoff on the source file referenced in the task file.
 After extraction: create per-claim task files, update the queue with new entries
 (1 entry per claim with current_phase/completed_phases), output RALPH HANDOFF.
 ONE PHASE ONLY. Do NOT run reflect or other phases.
@@ -188,7 +188,7 @@ Read the task file at ops/queue/{FILE} for context.
 You are processing task {ID} from the work queue.
 Phase: create | Target claim: {TARGET}
 
-Create a {DOMAIN:note} for this claim in {DOMAIN:notes}/[claim as sentence].md
+Create a claim for this claim in notes/[claim as sentence].md
 Follow note design patterns:
 - YAML frontmatter with description (adds info beyond title), topics
 - Body: 150-400 words showing reasoning with connective words
@@ -205,7 +205,7 @@ You are processing task {ID} from the work queue.
 Phase: enrich | Target: {TARGET}
 
 Run /enrich --handoff using the task file for context.
-The task file specifies which existing {DOMAIN:note} to enrich and what to add.
+The task file specifies which existing claim to enrich and what to add.
 ONE PHASE ONLY. Do NOT run reflect.
 ```
 
@@ -224,10 +224,10 @@ OTHER CLAIMS FROM THIS BATCH (check connections to these alongside regular disco
 - [[{SIBLING_TARGET}]]
 {end for, or "None yet" if this is the first claim}
 
-Run /reflect --handoff on: {TARGET}
-Use dual discovery: {DOMAIN:topic map} exploration AND semantic search.
+Run /arscontexta:connect --handoff on: {TARGET}
+Use dual discovery: topic map exploration AND semantic search.
 Add inline links where genuine connections exist — including sibling claims listed above.
-Update relevant {DOMAIN:topic map} with this {DOMAIN:note}.
+Update relevant topic map with this claim.
 ONE PHASE ONLY. Do NOT run reweave.
 ```
 
@@ -246,10 +246,10 @@ OTHER CLAIMS FROM THIS BATCH:
 - [[{SIBLING_TARGET}]]
 {end for}
 
-Run /reweave --handoff for: {TARGET}
-This is the BACKWARD pass. Find OLDER {DOMAIN:note_plural} AND sibling claims
-that should reference this {DOMAIN:note} but don't.
-Add inline links FROM older {DOMAIN:note_plural} TO this {DOMAIN:note}.
+Run /arscontexta:reweave --handoff for: {TARGET}
+This is the BACKWARD pass. Find OLDER claims AND sibling claims
+that should reference this claim but don't.
+Add inline links FROM older claims TO this claim.
 ONE PHASE ONLY. Do NOT run verify.
 ```
 
@@ -260,11 +260,11 @@ Read the task file at ops/queue/{FILE} for context.
 You are processing task {ID} from the work queue.
 Phase: verify | Target: {TARGET}
 
-Run /verify --handoff on: {TARGET}
+Run /arscontexta:verify --handoff on: {TARGET}
 Combined verification: recite (cold-read prediction test), validate (schema check),
 review (per-note health).
 IMPORTANT: Recite runs FIRST — read only title+description, predict content,
-THEN read full {DOMAIN:note}.
+THEN read full claim.
 Final phase for this claim. ONE PHASE ONLY.
 ```
 
@@ -362,7 +362,7 @@ Check backward link gaps. Output RALPH HANDOFF block when done.",
 **Incompatible flags:** `--parallel` cannot be combined with `--type`. Parallel mode processes claims end-to-end (all phases). If `--type` is also set, report an error:
 ```
 ERROR: --parallel and --type are incompatible. Parallel processes full claim pipelines, not individual phases.
-Use serial mode for per-phase filtering: /ralph N --type reflect
+Use serial mode for per-phase filtering: /arscontexta:ralph N --type reflect
 ```
 
 ### Parallel Architecture
@@ -419,7 +419,7 @@ SIBLING CLAIMS IN THIS BATCH (link to these where genuine connections exist):
 {end for}
 
 During REFLECT and REWEAVE, check if your claim genuinely connects to any sibling.
-If a sibling {DOMAIN:note} exists in {DOMAIN:notes}/, link to it inline where the
+If a sibling claim exists in notes/, link to it inline where the
 connection is real. If it does not exist yet (still being created), skip —
 cross-connect will catch it after.
 
@@ -427,7 +427,7 @@ Read the task file for full context. Execute phases from current_phase onwards.
 If completed_phases is not empty, skip those phases (resumption mode).
 
 When complete, update the queue entry to status "done" and report the created
-{DOMAIN:note} title, path, and claim ID. The lead needs this for cross-connect.
+claim title, path, and claim ID. The lead needs this for cross-connect.
 ```
 
 Spawn via Task tool:
@@ -523,7 +523,7 @@ Queue state:
   Phase distribution: {create: N, reflect: N, reweave: N, verify: N}
 
 Next steps:
-  {if more pending tasks}: Run /ralph {remaining} to continue
+  {if more pending tasks}: Run /arscontexta:ralph {remaining} to continue
   {if batch complete}: Run /archive-batch {batch-id}
   {if queue empty}: All tasks processed
 ```
@@ -555,13 +555,13 @@ Queue Updates:
 
 ## Error Recovery
 
-**Subagent crash mid-phase:** The queue still shows `current_phase` at the failed phase. The task file confirms the corresponding section is empty. Re-running `/ralph` picks it up automatically — the task is still pending at that phase.
+**Subagent crash mid-phase:** The queue still shows `current_phase` at the failed phase. The task file confirms the corresponding section is empty. Re-running `/arscontexta:ralph` picks it up automatically — the task is still pending at that phase.
 
 **Queue corruption:** If the queue file is malformed, report the error and stop. Do NOT attempt to fix it automatically.
 
 **All tasks blocked:** Report which tasks are blocked and why. Suggest remediation.
 
-**Empty queue:** Report "Queue is empty. Use /seed or /pipeline to add sources."
+**Empty queue:** Report "Queue is empty. Use /arscontexta:seed or /arscontexta:pipeline to add sources."
 
 ---
 

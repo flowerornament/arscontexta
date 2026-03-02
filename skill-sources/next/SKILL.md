@@ -1,6 +1,6 @@
 ---
 name: next
-description: Surface the most valuable next action by combining task stack, queue state, inbox pressure, health, and goals. Recommends one specific action with rationale. Triggers on "/next", "what should I do", "what's next".
+description: Surface the most valuable next action by combining task stack, queue state, inbox pressure, health, and goals. Recommends one specific action with rationale. Triggers on "/arscontexta:next", "what should I do", "what's next".
 version: "1.0"
 generated_from: "arscontexta-v1.6"
 user-invocable: true
@@ -17,7 +17,7 @@ Read these files to configure domain-specific behavior:
    - Use `vocabulary.notes` for the notes folder name
    - Use `vocabulary.inbox` for the inbox folder name
    - Use `vocabulary.note` for the note type name in output
-   - Use `vocabulary.topic_map` for MOC references
+   - Use `vocabulary.topic_map` for topic map references
    - Use `vocabulary.cmd_reduce` for process/extract command
    - Use `vocabulary.cmd_reflect` for connection-finding command
    - Use `vocabulary.cmd_reweave` for backward-pass command
@@ -31,7 +31,7 @@ If these files don't exist, use universal defaults and generic command names.
 
 ## EXECUTE NOW
 
-**INVARIANT: /next recommends, it does not execute.** Present one recommendation with rationale. The user decides what to do. This prevents cognitive outsourcing where the system makes all work decisions and the user becomes a rubber stamp.
+**INVARIANT: /arscontexta:next recommends, it does not execute.** Present one recommendation with rationale. The user decides what to do. This prevents cognitive outsourcing where the system makes all work decisions and the user becomes a rubber stamp.
 
 **Execute these steps IN ORDER:**
 
@@ -58,9 +58,9 @@ Before collecting state, evaluate all maintenance conditions and reconcile the q
 
 | Condition | Evaluation Method |
 |-----------|------------------|
-| orphan_notes | For each note in {vocabulary.notes}/, count incoming [[links]]. Zero = orphan. |
+| orphan_notes | For each note in notes/, count incoming [[links]]. Zero = orphan. |
 | dangling_links | Extract all [[links]], verify targets exist as files. Missing = dangling. |
-| inbox_pressure | Count *.md in {vocabulary.inbox}/. |
+| inbox_pressure | Count *.md in inbox/. |
 | observation_accumulation | Count status: pending in ops/observations/. |
 | tension_accumulation | Count status: pending or open in ops/tensions/. |
 | pipeline_stalled | Queue tasks with status: pending unchanged across sessions. |
@@ -118,8 +118,8 @@ Gather all signals. Run independent checks in parallel where possible. Record ea
 |--------|--------------|----------------|
 | **Task stack** | Read `ops/tasks.md` — current priorities and open items | Top items, open count, any deadlines |
 | **Queue state** | Read `ops/queue.yaml` or `ops/queue/queue.json` — pending pipeline tasks | Total pending, by phase (create, reflect, reweave, verify), blocked phases |
-| **Inbox pressure** | Count `*.md` files in {vocabulary.inbox}/, find oldest by mtime | Count per subdirectory, age of oldest item in days |
-| **Note count** | Count `*.md` in {vocabulary.notes}/ | Total notes for context |
+| **Inbox pressure** | Count `*.md` files in inbox/, find oldest by mtime | Count per subdirectory, age of oldest item in days |
+| **Note count** | Count `*.md` in notes/ | Total notes for context |
 | **Orphan notes** | For each note, grep for `[[filename]]` across all files — zero hits = orphan | Count, first 5 names |
 | **Dangling links** | Extract all `[[links]]` from notes/, verify each target file exists | Count, first 5 targets |
 | **Stale notes** | Notes not modified recently AND with low link density (< 2 links) | Count |
@@ -129,10 +129,10 @@ Gather all signals. Run independent checks in parallel where possible. Record ea
 | **Methodology** | Check `ops/methodology/` for recent captures (files modified in last 7 days) | Count of recent, total count |
 | **Health** | Read most recent report in `ops/health/` — note timestamp and issues | Last run date, issue count, any critical issues |
 | **Sessions** | Check `ops/sessions/` for files without `mined: true` in frontmatter | Count of unmined sessions |
-| **Recent /next** | Read `ops/next-log.md` (if exists) — last 3 recommendations | Previous suggestions to avoid repetition |
+| **Recent /arscontexta:next** | Read `ops/next-log.md` (if exists) — last 3 recommendations | Previous suggestions to avoid repetition |
 
 **Adaptation rules:**
-- Directory names adapt to domain vocabulary (e.g., {vocabulary.inbox} instead of hardcoded "inbox")
+- Directory names adapt to domain vocabulary (e.g., inbox instead of hardcoded "inbox")
 - Skip checks silently for directories that do not exist — do not report "ops/sessions/ not found"
 - A missing directory means that feature is not active, which is valid state
 
@@ -140,11 +140,11 @@ Gather all signals. Run independent checks in parallel where possible. Record ea
 
 ```bash
 # Inbox pressure (adapt path to vocabulary)
-INBOX_COUNT=$(find {vocabulary.inbox}/ -name "*.md" -maxdepth 2 2>/dev/null | wc -l | tr -d ' ')
-OLDEST_INBOX=$(find {vocabulary.inbox}/ -name "*.md" -maxdepth 2 -exec stat -f "%m %N" {} \; 2>/dev/null | sort -n | head -1)
+INBOX_COUNT=$(find inbox/ -name "*.md" -maxdepth 2 2>/dev/null | wc -l | tr -d ' ')
+OLDEST_INBOX=$(find inbox/ -name "*.md" -maxdepth 2 -exec stat -f "%m %N" {} \; 2>/dev/null | sort -n | head -1)
 
 # Note count
-NOTE_COUNT=$(ls -1 {vocabulary.notes}/*.md 2>/dev/null | wc -l | tr -d ' ')
+NOTE_COUNT=$(ls -1 notes/*.md 2>/dev/null | wc -l | tr -d ' ')
 
 # Pending observations
 OBS_COUNT=$(grep -rl '^status: pending' ops/observations/ 2>/dev/null | wc -l | tr -d ' ')
@@ -166,9 +166,9 @@ Evaluate every signal against consequence speed — how fast does inaction degra
 |-------|---------|-----------|-------------------|
 | **Session** | Inbox > 5 items, orphan notes (any), dangling links (any), 10+ pending observations, 5+ pending tensions, unprocessed sessions > 3 | Immediate — these degrade work quality right now | Orphans are invisible to traversal. Dangling links confuse navigation. Inbox pressure means lost ideas. Observation/tension thresholds mean the system is accumulating unprocessed friction. |
 | **Multi-session** | Pipeline queue backlog > 10, research gaps identified in goals, stale notes > 10, inbox items aging > 7 days, methodology captures > 5 in same category | Soon — these compound over days | Unfinished pipeline batches block downstream connections. Stale notes represent decaying knowledge. Aging inbox means capture is outpacing processing. |
-| **Slow** | Health check not run in 14+ days, {DOMAIN:topic map} oversized (>40 notes), link density below 2.0 average, low note count relative to time | Background — annoying but not blocking | These are maintenance tasks. Important for long-term health but not urgent. |
+| **Slow** | Health check not run in 14+ days, topic map oversized (>40 notes), link density below 2.0 average, low note count relative to time | Background — annoying but not blocking | These are maintenance tasks. Important for long-term health but not urgent. |
 
-**Threshold rule:** 10+ pending observations OR 5+ pending tensions is ALWAYS session-priority. Recommend {DOMAIN:rethink} in this case.
+**Threshold rule:** 10+ pending observations OR 5+ pending tensions is ALWAYS session-priority. Recommend rethink in this case.
 
 **Signal interaction rules:**
 - Task stack items ALWAYS override automated recommendations (user-set priorities beat system-detected urgency)
@@ -209,10 +209,10 @@ If no task stack items, pick the highest-impact session-priority signal:
 
 | Signal | Recommendation | Rationale Template |
 |--------|---------------|-------------------|
-| Dangling links / orphans | /health or specific fix command | "You have [N] orphan notes invisible to traversal. Connecting them increases graph density and retrieval quality." |
-| 10+ observations or 5+ tensions | /{DOMAIN:rethink} | "[N] pending observations have accumulated. Pattern detection requires processing this backlog to evolve the system." |
-| Inbox > 5 items | /{DOMAIN:reduce} [specific file] | "Your inbox has [N] items (oldest: [age]). [File X] has the highest connection potential based on [reason]." |
-| Unprocessed sessions > 3 | /remember --mine-sessions | "[N] sessions have uncaptured friction patterns. Mining them prevents methodology regressions." |
+| Dangling links / orphans | /arscontexta:health or specific fix command | "You have [N] orphan notes invisible to traversal. Connecting them increases graph density and retrieval quality." |
+| 10+ observations or 5+ tensions | /arscontexta:rethink | "[N] pending observations have accumulated. Pattern detection requires processing this backlog to evolve the system." |
+| Inbox > 5 items | /arscontexta:extract [specific file] | "Your inbox has [N] items (oldest: [age]). [File X] has the highest connection potential based on [reason]." |
+| Unprocessed sessions > 3 | /arscontexta:remember --mine-sessions | "[N] sessions have uncaptured friction patterns. Mining them prevents methodology regressions." |
 
 **When recommending inbox processing:** Choose the specific inbox item that aligns best with current goals or has the most connection potential to existing notes. Recommend a concrete file, not "process some inbox."
 
@@ -222,10 +222,10 @@ If no session-priority items:
 
 | Signal | Recommendation | Rationale Template |
 |--------|---------------|-------------------|
-| Queue backlog > 10 | /ralph [N] | "[N] pipeline tasks are pending. Your newest {DOMAIN:notes} lack connections, which means they can't participate in synthesis." |
-| Stale notes > 10 | /{DOMAIN:reweave} [specific note] | "[N] notes haven't been touched since [date]. [Note X] has the most connections and would benefit most from updating." |
-| Research gaps | /{DOMAIN:reduce} [file aligned with goals] | "Your goals mention [topic] but your graph has few notes there. [Inbox item] addresses this gap." |
-| Methodology convergence | /{DOMAIN:rethink} | "[N] methodology captures in the [category] area suggest a pattern worth elevating." |
+| Queue backlog > 10 | /arscontexta:ralph [N] | "[N] pipeline tasks are pending. Your newest notes lack connections, which means they can't participate in synthesis." |
+| Stale notes > 10 | /arscontexta:reweave [specific note] | "[N] notes haven't been touched since [date]. [Note X] has the most connections and would benefit most from updating." |
+| Research gaps | /arscontexta:extract [file aligned with goals] | "Your goals mention [topic] but your graph has few notes there. [Inbox item] addresses this gap." |
+| Methodology convergence | /arscontexta:rethink | "[N] methodology captures in the [category] area suggest a pattern worth elevating." |
 
 **When recommending reweaving:** Choose the most-connected stale note (highest link density + oldest modification). Reweaving high-connectivity notes has the highest ripple effect.
 
@@ -235,9 +235,9 @@ If nothing pressing:
 
 | Signal | Recommendation | Rationale Template |
 |--------|---------------|-------------------|
-| No recent health check | /health | "Last health check was [date]. Running one now catches structural issues before they compound." |
+| No recent health check | /arscontexta:health | "Last health check was [date]. Running one now catches structural issues before they compound." |
 | Topic map oversized | Restructuring suggestion | "[Topic map X] has [N] notes. Splitting into sub-topic-maps improves navigation and reduces cognitive load." |
-| Low link density | /{DOMAIN:reweave} on lowest-density note | "Your graph has an average link density of [N]. Reweaving sparse notes increases traversal paths." |
+| Low link density | /arscontexta:reweave on lowest-density note | "Your graph has an average link density of [N]. Reweaving sparse notes increases traversal paths." |
 
 #### 5. Everything Clean
 
@@ -252,7 +252,7 @@ next
   No urgent work detected.
 
   Suggested: Explore a new direction from goals.md
-  or reweave older {DOMAIN:notes} to deepen the graph.
+  or reweave older notes to deepen the graph.
 ```
 
 **Rationale is always mandatory.** Every recommendation must explain:
@@ -298,10 +298,10 @@ next
 
 | Good | Bad |
 |------|-----|
-| `/{DOMAIN:reduce} inbox/article-on-spaced-repetition.md` | "process some inbox items" |
-| `/ralph 5` | "work on the queue" |
-| `/{DOMAIN:rethink}` | "review your observations" |
-| `/{DOMAIN:reweave} [[note title here]]` | "update some old notes" |
+| `/arscontexta:extract inbox/article-on-spaced-repetition.md` | "process some inbox items" |
+| `/arscontexta:ralph 5` | "work on the queue" |
+| `/arscontexta:rethink` | "review your observations" |
+| `/arscontexta:reweave [[note title here]]` | "update some old notes" |
 
 **State display rules:**
 - Show only 2-4 decision-relevant signals — not all 14 checks
@@ -326,7 +326,7 @@ Append to `ops/next-log.md` (create if missing):
 **Why log?** The log serves three purposes:
 1. Deduplication — prevents recommending the same action repeatedly
 2. Evolution tracking — shows what signals have been persistent vs transient
-3. /rethink evidence — persistent recommendations that go unacted-on may reveal misalignment between what the system detects and what the user values
+3. /arscontexta:rethink evidence — persistent recommendations that go unacted-on may reveal misalignment between what the system detects and what the user values
 
 ---
 
@@ -342,7 +342,7 @@ next
   State:
     Notes: [N] — early stage vault
 
-  Recommended: Capture or /{DOMAIN:reduce} content
+  Recommended: Capture or /arscontexta:extract content
   Rationale: Your graph has [N] notes. At this stage, adding
   content matters more than maintaining structure. Health checks,
   reweaving, and rethink become valuable after ~10 notes.
@@ -355,7 +355,7 @@ Say so explicitly. Recommend exploratory work aligned with goals, or reflective 
 ```
   No urgent work detected. Consider:
   - Exploring a research direction from goals.md
-  - Reweaving older {DOMAIN:notes} to deepen connections
+  - Reweaving older notes to deepen connections
   - Reviewing and updating goals.md itself
 ```
 
@@ -365,14 +365,14 @@ Recommend creating `self/goals.md` or `ops/goals.md` first. Without priorities, 
 
 ```
   Recommended: Create ops/goals.md
-  Rationale: Without goals, /next can only recommend based on
+  Rationale: Without goals, /arscontexta:next can only recommend based on
   automated detection. Goals let the system align recommendations
   with what actually matters to you.
 ```
 
 ### No ops/derivation-manifest.md
 
-Use universal vocabulary. Do not fail — /next should always produce a recommendation regardless of configuration state.
+Use universal vocabulary. Do not fail — /arscontexta:next should always produce a recommendation regardless of configuration state.
 
 ### Queue Not Active
 
@@ -387,15 +387,15 @@ When several signals are at session priority simultaneously, pick the one that u
 
 If genuinely equal priority, pick the one the user has not been recommended recently (check next-log.md).
 
-### Stale /next Log
+### Stale /arscontexta:next Log
 
-If `ops/next-log.md` has not been updated in 14+ days, the user may not be running /next regularly. Note this but do not make it a recommendation — /next is optional, not mandatory.
+If `ops/next-log.md` has not been updated in 14+ days, the user may not be running /arscontexta:next regularly. Note this but do not make it a recommendation — /arscontexta:next is optional, not mandatory.
 
 ---
 
 ## Anti-Patterns
 
-These are patterns that /next must avoid:
+These are patterns that /arscontexta:next must avoid:
 
 | Anti-Pattern | Why It Is Wrong | What to Do Instead |
 |-------------|----------------|-------------------|

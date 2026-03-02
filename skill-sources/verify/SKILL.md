@@ -1,6 +1,6 @@
 ---
 name: verify
-description: Combined verification — recite (description quality via cold-read prediction) + validate (schema compliance) + review (health checks). Use as a quality gate after creating notes or as periodic maintenance. Triggers on "/verify", "/verify [note]", "verify note quality", "check note health".
+description: Combined verification — recite (description quality via cold-read prediction) + validate (schema compliance) + review (health checks). Use as a quality gate after creating claims or as periodic maintenance. Triggers on "/arscontexta:verify", "/arscontexta:verify [claim]", "verify claim quality", "check claim health".
 user-invocable: true
 allowed-tools: Read, Write, Edit, Grep, Glob, mcp__qmd__vector_search
 context: fork
@@ -14,7 +14,7 @@ Read these files to configure domain-specific behavior:
    - Use `vocabulary.notes` for the notes folder name
    - Use `vocabulary.note` / `vocabulary.note_plural` for note type references
    - Use `vocabulary.verify` for the process verb in output
-   - Use `vocabulary.topic_map` for MOC references
+   - Use `vocabulary.topic_map` for topic map references
    - Use `vocabulary.templates` for the templates folder path
    - Use `vocabulary.cmd_reflect` for redirect when missing connections found
 
@@ -30,8 +30,8 @@ If these files don't exist, use universal defaults.
 
 | Depth | Verification Behavior |
 |-------|-----------------------|
-| deep | Full verification: cold-read prediction, complete schema check, exhaustive link verification, MOC coverage, orphan risk analysis, content staleness detection, bundling analysis |
-| standard | Balanced: cold-read prediction, schema check, link verification, MOC coverage |
+| deep | Full verification: cold-read prediction, complete schema check, exhaustive link verification, topic map coverage, orphan risk analysis, content staleness detection, bundling analysis |
+| standard | Balanced: cold-read prediction, schema check, link verification, topic map coverage |
 | quick | Basic: schema check, link verification only. Skip cold-read prediction and health analysis |
 
 ## EXECUTE NOW
@@ -59,9 +59,9 @@ Before marking verification as passed, you MUST complete ALL four categories:
 3. COMPLETE link verification — confirm ALL wiki links in the note
    resolve to existing files. A single dangling link FAILS.
 
-4. COMPLETE {DOMAIN:topic map} integration — verify the note appears in at least
-   one {DOMAIN:topic map}'s Core Ideas section with a context phrase.
-   A note with no {DOMAIN:topic map} mention FAILS.
+4. COMPLETE topic map integration — verify the note appears in at least
+   one topic map's Core Ideas section with a context phrase.
+   A note with no topic map mention FAILS.
 
 Do NOT declare success after checking only one or two categories.
 ALL FOUR must pass.
@@ -123,8 +123,8 @@ NOW read the complete note. Compare against your prediction.
 
 Test whether the description enables semantic retrieval:
 
-- Tier 1 (preferred): `mcp__qmd__vector_search` with query = "[the note's description text]", collection = "{vocabulary.notes_collection}", limit = 10
-- Tier 2 (CLI fallback): `qmd vsearch "[the note's description text]" --collection {vocabulary.notes_collection} -n 10`
+- Tier 1 (preferred): `mcp__qmd__vector_search` with query = "[the note's description text]", collection = "notes", limit = 10
+- Tier 2 (CLI fallback): `qmd vsearch "[the note's description text]" --collection notes -n 10`
 - Tier 3: if both MCP and qmd CLI are unavailable, report "retrieval test deferred (semantic search unavailable)" — do NOT skip silently
 
 Check where the note appears in results:
@@ -154,7 +154,7 @@ If prediction score < 3:
 ### Step 2: VALIDATE (schema check)
 
 Read the template that applies to this note type. Determine the template by checking:
-- Note location (e.g., {DOMAIN:notes}/ uses the standard note template)
+- Note location (e.g., notes/ uses the standard note template)
 - Type field in frontmatter (if present, may indicate a specialized template)
 
 If the vault has templates with `_schema` blocks, read the `_schema` from the relevant template for authoritative field requirements. If no `_schema` exists, use the checks below as defaults.
@@ -164,7 +164,7 @@ If the vault has templates with `_schema` blocks, read the `_schema` from the re
 | Field | Requirement | Severity |
 |-------|-------------|----------|
 | `description` | Must exist and be non-empty | FAIL |
-| Topics footer or `topics` field | Must reference at least one {DOMAIN:topic map} | FAIL |
+| Topics footer or `topics` field | Must reference at least one topic map | FAIL |
 
 **Description constraints (WARN if violated):**
 
@@ -202,7 +202,7 @@ If the note has fields with enumerated values (type, category, status, etc.), ch
 | Constraint | Check | Severity |
 |------------|-------|----------|
 | Format | Array of wiki links: `["[[topic]]"]` | FAIL |
-| Links exist | Each {DOMAIN:topic map} must exist as a file | WARN |
+| Links exist | Each topic map must exist as a file | WARN |
 
 **Composability (WARN if fails):**
 
@@ -225,17 +225,17 @@ Run these 5 checks on the note:
 - Description adds information beyond the title
 - Description is not just the title rephrased
 
-**3. {DOMAIN:topic map} connection**
-- Note appears in at least one {DOMAIN:topic map}'s Core Ideas section
-- How to check: grep for `[[note title]]` in files that serve as {DOMAIN:topic map}s
-- The note's Topics footer references a valid {DOMAIN:topic map}
-- A note with no {DOMAIN:topic map} mention is orphaned — FAIL
+**3. topic map connection**
+- Note appears in at least one topic map's Core Ideas section
+- How to check: grep for `[[note title]]` in files that serve as topic maps
+- The note's Topics footer references a valid topic map
+- A note with no topic map mention is orphaned — FAIL
 
 **4. Wiki link density**
 - Count outgoing wiki links in the note body (not just frontmatter)
 - Expected minimum: 2 outgoing links
 - If < 2: flag as sparse — the note is not participating in the graph
-- Sparse notes should be routed to /reflect for connection finding
+- Sparse notes should be routed to /arscontexta:connect for connection finding
 
 **5. Link resolution**
 - Scan ALL wiki links in the note — body, frontmatter `relevant_notes`, and Topics
@@ -269,13 +269,13 @@ If you have Edit tool access, apply fixes for clear-cut issues:
 - Improved description if recite score < 3
 - Missing `---` frontmatter delimiters
 - Trailing period on description
-- Missing Topics footer (if obvious which {DOMAIN:topic map} applies)
+- Missing Topics footer (if obvious which topic map applies)
 
 **Do NOT auto-fix (requires judgment):**
 - Bundled notes (splitting requires understanding the claims)
 - Content staleness (needs human review of factual accuracy)
-- Missing connections (use /reflect instead — connection finding is its own phase)
-- Ambiguous {DOMAIN:topic map} assignment (when note could fit multiple)
+- Missing connections (use /arscontexta:connect instead — connection finding is its own phase)
+- Ambiguous topic map assignment (when note could fit multiple)
 
 ### Step 5: Compile Results
 
@@ -300,7 +300,7 @@ VALIDATE:
 REVIEW:
   Frontmatter: [PASS/FAIL]
   Description quality: [PASS/WARN]
-  {DOMAIN:topic map} connection: [PASS/FAIL — which {DOMAIN:topic map}]
+  topic map connection: [PASS/FAIL — which topic map]
   Wiki links: N outgoing [PASS/WARN if < 2]
   Link resolution: [PASS/FAIL — broken links listed]
 
@@ -333,11 +333,11 @@ Combined verification: recite (description quality) + validate (schema complianc
 
 **verification is one concern, not three.**
 
-recite tests whether the description enables retrieval. validate checks schema compliance. review checks graph health. all three operate on the same note, read the same frontmatter, and together answer one question: is this {DOMAIN:note} ready?
+recite tests whether the description enables retrieval. validate checks schema compliance. review checks graph health. all three operate on the same note, read the same frontmatter, and together answer one question: is this claim ready?
 
 running them separately meant three context windows, three subagent spawns, three rounds of reading the same file. the checks are lightweight enough (combined context ~15-25% of window) that they fit comfortably in one session while staying in the smart zone.
 
-> "the unit of verification is the {DOMAIN:note}, not the check type."
+> "the unit of verification is the claim, not the check type."
 
 ## execution order matters
 
@@ -385,7 +385,7 @@ checks against the relevant template schema:
 
 1. **YAML frontmatter** — well-formed, has `---` delimiters, valid parsing
 2. **Description quality** — present, adds info beyond title, not a restatement
-3. **{DOMAIN:topic map} connection** — appears in at least one {DOMAIN:topic map}
+3. **topic map connection** — appears in at least one topic map
 4. **Wiki link count** — >= 2 outgoing links (graph participation threshold)
 5. **Link resolution** — all wiki links point to existing files (full body scan, excluding backtick-wrapped examples)
 
@@ -399,16 +399,16 @@ plus 3 deep-only checks for comprehensive audits:
 | Pattern | Symptom | Fix |
 |---------|---------|-----|
 | Title restated as description | Recite score 1-2, prediction trivially correct but content is richer | Rewrite description to add mechanism/scope |
-| Missing {DOMAIN:topic map} | Review fails MOC check | Add to appropriate {DOMAIN:topic map} or create Topics footer |
+| Missing topic map | Review fails topic map check | Add to appropriate topic map or create Topics footer |
 | Dangling links | Review fails link resolution | Remove link, create the target note, or fix the spelling |
-| Sparse note | < 2 outgoing links | Route to /reflect for connection finding |
+| Sparse note | < 2 outgoing links | Route to /arscontexta:connect for connection finding |
 | Schema drift | Enum values not in template | Update note to use valid values, or propose enum addition |
 
 ## batch mode (--all)
 
 When verifying all notes:
 
-1. Discover all notes in {DOMAIN:notes}/ directory
+1. Discover all notes in notes/ directory
 2. For each note, run the full verification pipeline
 3. Produce summary report:
    - Total notes checked
@@ -421,15 +421,15 @@ When verifying all notes:
 
 ## standalone invocation
 
-### /verify [note]
+### /arscontexta:verify [note]
 
 Run all three checks on a specific note. Full detailed report.
 
-### /verify --all
+### /arscontexta:verify --all
 
-Comprehensive audit of all notes in {DOMAIN:notes}/. Summary table + flagged failures.
+Comprehensive audit of all notes in notes/. Summary table + flagged failures.
 
-### /verify --handoff [note]
+### /arscontexta:verify --handoff [note]
 
 Pipeline mode for orchestrator. Runs full workflow, outputs RALPH HANDOFF block.
 
@@ -448,7 +448,7 @@ Work Done:
 - Description improved: [yes/no]
 
 Files Modified:
-- {DOMAIN:notes}/[note].md (description improved, if applicable)
+- notes/[note].md (description improved, if applicable)
 - [task file path] (Verify section updated, if applicable)
 
 Learnings:
@@ -483,7 +483,7 @@ Validate:
 
 Review:
 - Frontmatter: PASS
-- {DOMAIN:topic map} connection: PASS ([[topic]])
+- topic map connection: PASS ([[topic]])
 - Wiki links: N outgoing
 - Link resolution: PASS (all resolve)
 

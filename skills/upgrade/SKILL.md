@@ -1,6 +1,6 @@
 ---
 name: upgrade
-description: Apply plugin knowledge base updates to an existing generated system. Consults the Ars Contexta research graph for methodology improvements, proposes skill upgrades with research justification. Never auto-implements. Triggers on "/upgrade", "upgrade skills", "check for improvements", "update methodology".
+description: Apply plugin knowledge base updates to an existing generated system. Consults the Ars Contexta research graph for methodology improvements, proposes skill upgrades with research justification. Never auto-implements. Triggers on "/arscontexta:upgrade", "upgrade skills", "check for improvements", "update methodology".
 version: "1.0"
 generated_from: "arscontexta-v1.6"
 user-invocable: true
@@ -56,10 +56,10 @@ Generated skills and meta-skills follow fundamentally different upgrade mechanis
 
 | Category | Skills | Upgrade Mechanism |
 |----------|--------|-------------------|
-| **Generated skills** | /{vocabulary.reduce}, /{vocabulary.reflect}, /{vocabulary.reweave}, /{vocabulary.verify}, /ralph, /next, /remember, /{vocabulary.rethink}, /stats, /graph, /tasks, /refactor, /learn, /recommend, /ask | Runtime consultation with knowledge graph |
-| **Meta-skills** | /setup, /architect, /health, /reseed, /add-domain, /help, /tutorial, /upgrade | Plugin release cycle — update the plugin itself |
+| **Generated skills** | /{vocabulary.reduce}, /{vocabulary.reflect}, /{vocabulary.reweave}, /{vocabulary.verify}, /arscontexta:ralph, /arscontexta:next, /arscontexta:remember, /{vocabulary.rethink}, /arscontexta:stats, /arscontexta:graph, /arscontexta:tasks, /arscontexta:refactor, /arscontexta:learn, /arscontexta:recommend, /arscontexta:ask | Runtime consultation with knowledge graph |
+| **Meta-skills** | /arscontexta:setup, /arscontexta:architect, /arscontexta:health, /arscontexta:reseed, /arscontexta:add-domain, /arscontexta:help, /arscontexta:tutorial, /arscontexta:upgrade | Plugin release cycle — update the plugin itself |
 
-/upgrade evaluates generated skills. It cannot evaluate itself or other meta-skills — that is the plugin maintainers' responsibility.
+/arscontexta:upgrade evaluates generated skills. It cannot evaluate itself or other meta-skills — that is the plugin maintainers' responsibility.
 
 ---
 
@@ -338,7 +338,7 @@ After applying all approved upgrades:
    # Should return nothing — all markers should be resolved
    ```
 
-4. **Pipeline compatibility** — if pipeline skills were upgraded (/{vocabulary.reduce}, /{vocabulary.reflect}, /{vocabulary.reweave}, /{vocabulary.verify}), verify handoff format compatibility with /ralph
+4. **Pipeline compatibility** — if pipeline skills were upgraded (/{vocabulary.reduce}, /{vocabulary.reflect}, /{vocabulary.reweave}, /{vocabulary.verify}), verify handoff format compatibility with /arscontexta:ralph
 
 ---
 
@@ -370,7 +370,7 @@ to confirm upgraded skills work correctly in practice.
 
 ## INVARIANT
 
-**/upgrade never auto-implements.** The upgrade plan is always presented to the user first. The user decides which upgrades to apply. This prevents the cognitive outsourcing failure mode where the system changes itself without human understanding.
+**/arscontexta:upgrade never auto-implements.** The upgrade plan is always presented to the user first. The user decides which upgrades to apply. This prevents the cognitive outsourcing failure mode where the system changes itself without human understanding.
 
 All upgrades are advisory. The user owns the files.
 
@@ -386,9 +386,9 @@ All upgrades are advisory. The user owns the files.
 
 **No ops/derivation-manifest.md:** Use universal vocabulary for all output.
 
-**Plugin knowledge base unavailable:** Report that knowledge base consultation requires the Ars Contexta plugin. Without the plugin's bundled methodology/ and reference/ directories, /upgrade cannot evaluate skills.
+**Plugin knowledge base unavailable:** Report that knowledge base consultation requires the Ars Contexta plugin. Without the plugin's bundled methodology/ and reference/ directories, /arscontexta:upgrade cannot evaluate skills.
 
-**User rejects upgrades consistently:** This is a signal, not an error. Note the pattern — it may indicate the knowledge base recommendations don't match this user's domain. Log to ops/observations/ if it persists across multiple /upgrade runs.
+**User rejects upgrades consistently:** This is a signal, not an error. Note the pattern — it may indicate the knowledge base recommendations don't match this user's domain. Log to ops/observations/ if it persists across multiple /arscontexta:upgrade runs.
 
 **Correction conflicts with user modification:** When the knowledge base identifies a correction (not just enhancement) but the user has modified the skill, explain the conflict clearly. The user may have modified the skill precisely because the original approach was wrong — their fix may already address the correction. Show both and let the user decide.
 

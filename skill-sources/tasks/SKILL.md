@@ -1,6 +1,6 @@
 ---
 name: tasks
-description: View and manage the task stack and processing queue. Shows pending work, active tasks, completed items, and queue state. Triggers on "/tasks", "show tasks", "what's pending", "task list", "queue status".
+description: View and manage the task stack and processing queue. Shows pending work, active tasks, completed items, and queue state. Triggers on "/arscontexta:tasks", "show tasks", "what's pending", "task list", "queue status".
 version: "1.0"
 generated_from: "arscontexta-v1.6"
 user-invocable: true
@@ -17,7 +17,7 @@ Read these files to configure domain-specific behavior:
 1. **`ops/derivation-manifest.md`** — vocabulary mapping
    - Use `vocabulary.notes` for the notes folder name
    - Use `vocabulary.note` / `vocabulary.note_plural` for note type references
-   - Use `vocabulary.topic_map` for MOC references
+   - Use `vocabulary.topic_map` for topic map references
    - Use `vocabulary.cmd_reflect` / `vocabulary.cmd_reweave` / `vocabulary.cmd_verify` for phase command names
 
 2. **`ops/config.yaml`** — pipeline chaining mode, automation settings
@@ -50,16 +50,16 @@ The task stack (`ops/tasks.md`) and the pipeline queue (`ops/queue/queue.yaml` o
 
 | System | Purpose | Managed By | Updated By |
 |--------|---------|-----------|------------|
-| Task stack | Human priorities — what YOU want to work on | You (via /tasks) | Manual: /tasks add, /tasks done |
-| Pipeline queue | Automated processing state — what the SYSTEM needs to process | Pipeline skills | Automatic: /reduce, /ralph, /reflect |
+| Task stack | Human priorities — what YOU want to work on | You (via /arscontexta:tasks) | Manual: /arscontexta:tasks add, /arscontexta:tasks done |
+| Pipeline queue | Automated processing state — what the SYSTEM needs to process | Pipeline skills | Automatic: /arscontexta:extract, /arscontexta:ralph, /arscontexta:connect |
 
-/tasks shows BOTH so you always have a unified view of all pending work. The task stack is your working memory. The pipeline queue is the system's working memory. Together they answer: "What should I do next?"
+/arscontexta:tasks shows BOTH so you always have a unified view of all pending work. The task stack is your working memory. The pipeline queue is the system's working memory. Together they answer: "What should I do next?"
 
 ---
 
 ## Operations
 
-### /tasks (or /tasks status)
+### /arscontexta:tasks (or /arscontexta:tasks status)
 
 Show both the human task stack and the automated queue.
 
@@ -75,7 +75,7 @@ Parse the task stack into sections:
 - **Completed**: items marked `- [x]`
 - **Discoveries**: items noted during work (plain text, no checkbox)
 
-If `ops/tasks.md` does not exist, note: "No task stack found. Run `/tasks add [description]` to create one."
+If `ops/tasks.md` does not exist, note: "No task stack found. Run `/arscontexta:tasks add [description]` to create one."
 
 **Step 2: Read queue state**
 
@@ -151,12 +151,12 @@ fi
 
 | Condition | Note |
 |-----------|------|
-| Task stack empty | "No tasks on stack. Use `/tasks add [description]` to add one, or `/next` for suggestions." |
-| Pipeline has pending tasks | "Pipeline has {N} pending tasks. Run /ralph to process them." |
+| Task stack empty | "No tasks on stack. Use `/arscontexta:tasks add [description]` to add one, or `/arscontexta:next` for suggestions." |
+| Pipeline has pending tasks | "Pipeline has {N} pending tasks. Run /arscontexta:ralph to process them." |
 | Archivable batches exist | "Batch '{name}' is ready to archive. Run /archive-batch {name}." |
-| Both empty | "All clear. Use `/next` to find what to work on." |
+| Both empty | "All clear. Use `/arscontexta:next` to find what to work on." |
 
-### /tasks add [description]
+### /arscontexta:tasks add [description]
 
 Add a new task to the task stack.
 
@@ -195,7 +195,7 @@ Position: #{N} of {total}
 Stack now has {total} current tasks.
 ```
 
-### /tasks done [number]
+### /arscontexta:tasks done [number]
 
 Mark a task as completed.
 
@@ -229,9 +229,9 @@ Completed: {description}
 Remaining: {N} current tasks.
 ```
 
-**Integration with /next:** If the completed task was the top-priority item, suggest: "Top task completed. Run `/next` for the next recommendation."
+**Integration with /next:** If the completed task was the top-priority item, suggest: "Top task completed. Run `/arscontexta:next` for the next recommendation."
 
-### /tasks drop [number]
+### /arscontexta:tasks drop [number]
 
 Remove a task without completing it.
 
@@ -241,7 +241,7 @@ Parse the Current section to find the Nth task.
 
 **Step 2: Validate**
 
-Same range check as /tasks done.
+Same range check as /arscontexta:tasks done.
 
 **Step 3: Remove from Current**
 
@@ -257,7 +257,7 @@ Dropped: {description}
 Remaining: {N} current tasks.
 ```
 
-### /tasks reorder [number] [position]
+### /arscontexta:tasks reorder [number] [position]
 
 Move a task to a different position in the stack.
 
@@ -289,7 +289,7 @@ Current stack:
   ...
 ```
 
-### /tasks discoveries
+### /arscontexta:tasks discoveries
 
 Show only the Discoveries section from ops/tasks.md.
 
@@ -303,7 +303,7 @@ Show only the Discoveries section from ops/tasks.md.
    for processing in a future session."]
 ```
 
-Discoveries are captured during pipeline work (e.g., /reduce notes a connection opportunity, /reflect notices a split candidate). They accumulate here until the user decides to convert them to tasks or discard them.
+Discoveries are captured during pipeline work (e.g., /arscontexta:extract notes a connection opportunity, /arscontexta:connect notices a split candidate). They accumulate here until the user decides to convert them to tasks or discard them.
 
 ---
 
@@ -315,16 +315,16 @@ The task stack (ops/tasks.md) and pipeline queue coexist but serve different aud
 |--------|-----------|---------------|
 | File | ops/tasks.md | ops/queue/queue.yaml (or .json) |
 | Format | Markdown checklist | YAML/JSON with phase tracking |
-| Managed by | User via /tasks | Pipeline skills automatically |
-| Read by | /next (priority #1) | /ralph (phase routing) |
+| Managed by | User via /arscontexta:tasks | Pipeline skills automatically |
+| Read by | /arscontexta:next (priority #1) | /arscontexta:ralph (phase routing) |
 | Purpose | Human priorities | Automated processing state |
 
-**/next reads the task stack first.** If the stack has items, /next recommends from the stack (user-set priorities override automated recommendations). If the stack is empty, /next evaluates queue state and vault health to suggest actions.
+**/arscontexta:next reads the task stack first.** If the stack has items, /arscontexta:next recommends from the stack (user-set priorities override automated recommendations). If the stack is empty, /arscontexta:next evaluates queue state and vault health to suggest actions.
 
 **Skills that generate pipeline work update BOTH:**
-- `/reduce` adds tasks to the queue AND notes discoveries in tasks.md
-- `/seed` adds extract tasks to the queue
-- `/architect` may add implementation tasks to the task stack
+- `/arscontexta:extract` adds tasks to the queue AND notes discoveries in tasks.md
+- `/arscontexta:seed` adds extract tasks to the queue
+- `/arscontexta:architect` may add implementation tasks to the task stack
 
 ---
 
@@ -345,11 +345,11 @@ The task stack is a simple markdown checklist, always present from day one. Form
 - [x] Earlier task (2026-02-08)
 
 ## Discoveries
-- Interesting connection between [[note A]] and [[note B]] found during /reduce
-- MOC [[topic]] might need splitting (40+ notes observed during /reflect)
+- Interesting connection between [[note A]] and [[note B]] found during /arscontexta:extract
+- topic map [[topic]] might need splitting (40+ notes observed during /arscontexta:connect)
 ```
 
-**Current** is ordered by priority. Position 1 is highest priority. /tasks reorder adjusts position.
+**Current** is ordered by priority. Position 1 is highest priority. /arscontexta:tasks reorder adjusts position.
 
 **Completed** is ordered by completion date (most recent first). Provides history of what was accomplished.
 
@@ -361,7 +361,7 @@ The task stack is a simple markdown checklist, always present from day one. Form
 
 ### No ops/tasks.md
 
-Create it with empty sections on first `/tasks add`. For `/tasks status`, report: "No task stack found. Use `/tasks add [description]` to create one."
+Create it with empty sections on first `/arscontexta:tasks add`. For `/arscontexta:tasks status`, report: "No task stack found. Use `/arscontexta:tasks add [description]` to create one."
 
 ### No Queue File
 
@@ -379,8 +379,8 @@ Report the error with the valid range: "Task #{N} does not exist. Current tasks:
   Current:
     (empty)
 
-  Use `/tasks add [description]` to add a task,
-  or `/next` for automated suggestions.
+  Use `/arscontexta:tasks add [description]` to add a task,
+  or `/arscontexta:next` for automated suggestions.
 ```
 
 ### No ops/derivation-manifest.md

@@ -1,6 +1,6 @@
 ---
 name: rethink
-description: Challenge system assumptions against accumulated evidence. Triages observations and tensions, detects patterns, generates proposals. The scientific method applied to knowledge systems. Triggers on "/rethink", "review observations", "challenge assumptions", "what have I learned".
+description: Challenge system assumptions against accumulated evidence. Triages observations and tensions, detects patterns, generates proposals. The scientific method applied to knowledge systems. Triggers on "/arscontexta:rethink", "review observations", "challenge assumptions", "what have I learned".
 user-invocable: true
 allowed-tools: Read, Write, Edit, Grep, Glob, Bash, AskUserQuestion
 context: fork
@@ -14,7 +14,7 @@ Read these files to configure domain-specific behavior:
    - Use `vocabulary.notes` for the notes folder name
    - Use `vocabulary.note` for the note type name in output
    - Use `vocabulary.rethink` for the command name in output
-   - Use `vocabulary.topic_map` for MOC references
+   - Use `vocabulary.topic_map` for topic map references
    - Use `vocabulary.cmd_reflect` for connection-finding references
 
 2. **`ops/config.yaml`** — thresholds, processing preferences
@@ -46,11 +46,11 @@ Parse immediately:
 
 **The system is not sacred. Evidence beats intuition.**
 
-Every rule in the context file, every workflow in a skill, every assumption baked into the architecture was a hypothesis at some point. Hypotheses need testing against reality. Observation notes in `ops/observations/` capture friction from actual use. Tension notes in `ops/tensions/` capture unresolved conflicts. Rethink first triages these individually (some become {DOMAIN:notes}, some become methodology updates, some get archived), then compares remaining evidence against what the system assumes and proposes changes when patterns emerge.
+Every rule in the context file, every workflow in a skill, every assumption baked into the architecture was a hypothesis at some point. Hypotheses need testing against reality. Observation notes in `ops/observations/` capture friction from actual use. Tension notes in `ops/tensions/` capture unresolved conflicts. Rethink first triages these individually (some become notes, some become methodology updates, some get archived), then compares remaining evidence against what the system assumes and proposes changes when patterns emerge.
 
 This is the scientific method applied to knowledge systems: hypothesize, implement, observe, revise.
 
-Without this loop, generated systems ossify — they accumulate friction that never gets addressed, contradictions that never get resolved, and methodology learnings that never get elevated to system-level changes. /rethink is the immune system that prevents calcification.
+Without this loop, generated systems ossify — they accumulate friction that never gets addressed, contradictions that never get resolved, and methodology learnings that never get elevated to system-level changes. /arscontexta:rethink is the immune system that prevents calcification.
 
 ---
 
@@ -171,7 +171,7 @@ Assign exactly one disposition per observation or tension:
 
 | Disposition | Meaning | When to Apply | Action |
 |-------------|---------|---------------|--------|
-| PROMOTE | Reusable insight worth keeping as a permanent {DOMAIN:note} | General principle across sessions. Would work as a claim note. Crystallized insight, not operational guidance. | Create {DOMAIN:note} in {vocabulary.notes}/, set observation `status: promoted`, add `promoted_to: [[title]]` |
+| PROMOTE | Reusable insight worth keeping as a permanent claim | General principle across sessions. Would work as a claim note. Crystallized insight, not operational guidance. | Create claim in notes/, set observation `status: promoted`, add `promoted_to: [[title]]` |
 | IMPLEMENT | Operational guidance that should change the system | "System should do X differently." Points to a concrete improvement in context file, template, or skill. | Update the specific file, set `status: implemented`, add `implemented_in: [filepath]` |
 | METHODOLOGY | Friction pattern that should inform agent behavior | Behavioral learning. Not a domain insight (PROMOTE) or a system change (IMPLEMENT) — a methodology learning about HOW to operate. | Create or update methodology note in `ops/methodology/`, set `status: implemented`, add `implemented_in: ops/methodology/[file]` |
 | ARCHIVE | Session-specific, no longer relevant | One-session-specific with no lasting value. Already addressed by later work. Superseded by newer evidence. | Set `status: archived` |
@@ -188,7 +188,7 @@ Assign exactly one disposition per observation or tension:
 **Triage heuristics for tensions:**
 
 - Tension was resolved by subsequent changes → ARCHIVE (set `status: dissolved`, add `dissolved_reason`)
-- Tension reveals a genuine conflict between two {DOMAIN:notes} → PROMOTE (create a tension {DOMAIN:note} or resolution {DOMAIN:note})
+- Tension reveals a genuine conflict between two notes → PROMOTE (create a tension claim or resolution claim)
 - Tension points to a system workflow that needs redesigning → IMPLEMENT
 - Tension is about agent methodology → METHODOLOGY
 - Tension is real but resolution is unclear → KEEP PENDING
@@ -198,13 +198,13 @@ Assign exactly one disposition per observation or tension:
 Present the full triage to the user before executing any changes:
 
 ```
---=={ {DOMAIN:rethink} — Triage }==--
+--=={ rethink — Triage }==--
 
   Evidence: [N] observations, [M] tensions
 
   PROMOTE ([count])
-    [filename] — [title] → proposed {DOMAIN:note} title
-    [filename] — [title] → proposed {DOMAIN:note} title
+    [filename] — [title] → proposed claim title
+    [filename] — [title] → proposed claim title
 
   IMPLEMENT ([count])
     [filename] — [title] → change [specific file/section]
@@ -230,8 +230,8 @@ Use AskUserQuestion: "Review the triage above. Approve all, or list items to rec
 After user confirmation, apply all dispositions in order:
 
 **For PROMOTE items:**
-1. Create {DOMAIN:note} with prose-as-title in {vocabulary.notes}/
-2. Follow standard note schema: YAML frontmatter (description, type, created), body developing the insight, Topics footer linking to relevant {vocabulary.topic_map}(s)
+1. Create claim with prose-as-title in notes/
+2. Follow standard note schema: YAML frontmatter (description, type, created), body developing the insight, Topics footer linking to relevant topic map(s)
 3. The observation content becomes the seed for the note body — but develop it fully, do not just copy the observation
 4. Update the observation: set `status: promoted`, add `promoted_to: [[note title]]`
 
@@ -249,7 +249,7 @@ After user confirmation, apply all dispositions in order:
 **For KEEP PENDING items:**
 1. No changes — leave in place
 
-**Update MOCs:** After triage execution, update `ops/observations.md` and `ops/tensions.md` to reflect status changes. Move entries between Pending/Promoted/Archived/Resolved/Dissolved sections as appropriate.
+**Update topic maps:** After triage execution, update `ops/observations.md` and `ops/tensions.md` to reflect status changes. Move entries between Pending/Promoted/Archived/Resolved/Dissolved sections as appropriate.
 
 ---
 
@@ -299,7 +299,7 @@ Before creating a new methodology note:
 2. Check if any existing note covers the same behavioral area
 3. If overlap > 80%, extend rather than duplicate
 
-### Update Methodology MOC
+### Update Methodology topic map
 
 After creating or updating methodology notes, update `ops/methodology.md`:
 - Add new notes to the appropriate category section
@@ -325,14 +325,14 @@ Analyze remaining pending evidence (post-triage) plus promoted/implemented histo
 | Recurring themes | 3+ observations about the same area or concept | Systemic issue requiring structural response | Something is fundamentally misaligned in that area |
 | Contradiction clusters | Multiple tensions pointing at the same architectural assumption | Assumption may be wrong | The system has a flawed foundation in that area |
 | Friction accumulation | Multiple observations about the same workflow step | Workflow needs redesign | A specific process is consistently painful |
-| Drift signals | Observations suggesting vocabulary, structure, or threshold sensitivity no longer fits | /architect or /reseed territory | The system's configuration may have outgrown the user's actual needs |
-| Methodology convergence | Multiple /remember captures in ops/methodology/ pointing at the same behavioral pattern | Methodology note needs elevation to context file | A methodology learning has been validated enough to become a system-level rule |
+| Drift signals | Observations suggesting vocabulary, structure, or threshold sensitivity no longer fits | /arscontexta:architect or /arscontexta:reseed territory | The system's configuration may have outgrown the user's actual needs |
+| Methodology convergence | Multiple /arscontexta:remember captures in ops/methodology/ pointing at the same behavioral pattern | Methodology note needs elevation to context file | A methodology learning has been validated enough to become a system-level rule |
 
 ### Detection Method
 
 1. **Group by category field:** Sort observations by their `category` (methodology, process-gap, friction, surprise, quality). 3+ items in the same category = potential pattern.
 
-2. **Group by referenced {DOMAIN:topic maps} or system areas:** Extract wiki links and file references from observation bodies. 3+ observations referencing the same area = recurring theme.
+2. **Group by referenced topic maps or system areas:** Extract wiki links and file references from observation bodies. 3+ observations referencing the same area = recurring theme.
 
 3. **Cross-reference tensions:** Check if multiple tensions share the same assumption. Multiple tensions pointing at the same thing = assumption may be wrong.
 
@@ -357,7 +357,7 @@ Only report patterns that pass all four checks.
 ### Pattern Report
 
 ```
---=={ {DOMAIN:rethink} — Patterns }==--
+--=={ rethink — Patterns }==--
 
   Patterns detected: [N]
 
@@ -434,18 +434,18 @@ Every proposal MUST have:
 | 2 observations, same area | Methodology note update |
 | 3+ observations, clear pattern | Skill or template change |
 | 5+ observations + tensions | Context file section change |
-| Pervasive pattern across areas | Architectural change (recommend /architect consultation) |
+| Pervasive pattern across areas | Architectural change (recommend /arscontexta:architect consultation) |
 
 Do not propose architectural changes based on thin evidence. The threshold scales with the blast radius.
 
-### /next Integration
+### /arscontexta:next Integration
 
 If 10+ pending observations or 5+ pending tensions remain after triage AND pattern detection did not consume them into proposals:
 
 ```
   Threshold signal for /next:
     [N] pending observations, [N] pending tensions remain
-    /next should prioritize {DOMAIN:rethink} at session priority
+    /arscontexta:next should prioritize rethink at session priority
 ```
 
 ---
@@ -457,11 +457,11 @@ If 10+ pending observations or 5+ pending tensions remain after triage AND patte
 ### Summary Output
 
 ```
---=={ {DOMAIN:rethink} — Complete }==--
+--=={ rethink — Complete }==--
 
   Triaged: [N] observations, [M] tensions
 
-    Promoted to {DOMAIN:notes}:  [count]
+    Promoted to notes:  [count]
     Methodology updates:         [count]
     Implemented:                 [count]
     Archived:                    [count]
@@ -506,7 +506,7 @@ For each approved proposal:
 ```markdown
 ## YYYY-MM-DD: [change title]
 
-**Source:** /{DOMAIN:rethink} — [pattern type]
+**Source:** /arscontexta:rethink — [pattern type]
 **Evidence:** [observation/tension filenames]
 **Change:** [what was modified, which files]
 **Risk:** [risk assessment from proposal]
@@ -526,18 +526,18 @@ For each approved proposal:
 
 ### Promoted Notes Need Connections
 
-If any observations were promoted to {DOMAIN:notes}:
+If any observations were promoted to notes:
 
 ```
-  [count] {DOMAIN:notes} were promoted from observations.
-  Run /{DOMAIN:connect} on promoted notes to find connections.
+  [count] notes were promoted from observations.
+  Run /arscontexta:connect on promoted notes to find connections.
   Promoted: [list of note titles]
 ```
 
 ### Pipeline Queue Integration
 
 If promoted items should enter the processing pipeline (queue-based systems):
-- Add each promoted {DOMAIN:note} to the queue with `current_phase: "reflect"` (the note already exists, so skip create)
+- Add each promoted claim to the queue with `current_phase: "reflect"` (the note already exists, so skip create)
 - Report queue additions
 
 ### Session Log
@@ -554,7 +554,7 @@ After rethink completes, capture the session itself. Create or append to `ops/re
 **Changes applied:** [list of files modified]
 ```
 
-This creates an evolution history. When /architect or /reseed runs, it can review the rethink log to understand how the system has evolved and what patterns have driven changes.
+This creates an evolution history. When /arscontexta:architect or /arscontexta:reseed runs, it can review the rethink log to understand how the system has evolved and what patterns have driven changes.
 
 ---
 
@@ -564,27 +564,27 @@ This creates an evolution history. When /architect or /reseed runs, it can revie
 
 These directories are part of the operational learning loop kernel primitive. If they do not exist:
 1. Report the structural gap
-2. Recommend creating them: "The operational learning loop requires `ops/observations/` and `ops/tensions/`. Create these directories and their MOC files to begin capturing system friction."
+2. Recommend creating them: "The operational learning loop requires `ops/observations/` and `ops/tensions/`. Create these directories and their topic map files to begin capturing system friction."
 3. Do not attempt to run rethink without evidence sources
 
 ### Nothing Pending
 
 Report clean state:
 ```
---=={ {DOMAIN:rethink} — Clean State }==--
+--=={ rethink — Clean State }==--
 
   No pending observations or tensions.
   The system has no accumulated friction to process.
 
   Continue capturing observations during normal work.
-  Run /{DOMAIN:rethink} again when signals accumulate.
+  Run /arscontexta:rethink again when signals accumulate.
 ```
 
-### Evidence Suggests /reseed
+### Evidence Suggests /arscontexta:reseed
 
 If 3+ drift signals are detected (vocabulary mismatch, structural misalignment, threshold disconnect between what the system expects and what the user actually does):
 - Report the drift pattern
-- Recommend /reseed over patching: "Drift signals suggest the system's fundamental configuration may need re-derivation, not incremental patching. Consider running /architect for a configuration review."
+- Recommend /arscontexta:reseed over patching: "Drift signals suggest the system's fundamental configuration may need re-derivation, not incremental patching. Consider running /arscontexta:architect for a configuration review."
 - Do not attempt to patch drift signals — they indicate the system's premises need re-evaluation, not its implementation
 
 ### < 5 Total Items
@@ -628,7 +628,7 @@ If the evidence pool is very large:
 - Dismiss evidence because it is inconvenient
 - Preserve assumptions out of tradition — evidence beats habit
 - Add complexity to handle edge cases when simplification would work better
-- Create {DOMAIN:notes} directly from observations without going through standard pipeline (PROMOTE adds to queue)
+- Create notes directly from observations without going through standard pipeline (PROMOTE adds to queue)
 - Re-propose rejected changes without new evidence
 
 **Always:**
@@ -637,7 +637,7 @@ If the evidence pool is very large:
 - Propose tests for new approaches — how will you know if the change worked?
 - Respect that the human makes final decisions on system changes
 - Log changes to ops/changelog.md for evolution tracking
-- Update MOCs after triage changes status of observations/tensions
+- Update topic maps after triage changes status of observations/tensions
 
 ## The Meta-Layer
 
@@ -646,12 +646,12 @@ Rethink is the system's immune system. It detects when assumptions have become i
 The methodology learning loop closes here:
 ```
 Work happens → friction captured as observations/tensions
-  → /remember captures immediate corrections
+  → /arscontexta:remember captures immediate corrections
   → observations accumulate
-  → /rethink triages + detects patterns + proposes changes
+  → /arscontexta:rethink triages + detects patterns + proposes changes
   → human approves changes
   → system evolves
   → less friction → fewer observations → healthy system
 ```
 
-Run {DOMAIN:rethink}. Let evidence win.
+Run rethink. Let evidence win.

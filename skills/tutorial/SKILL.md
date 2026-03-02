@@ -1,6 +1,6 @@
 ---
 name: tutorial
-description: Interactive walkthrough for new users. Learn by doing — each step creates real content in your vault. Three tracks (researcher, manager, personal) with a universal learning arc. Triggers on "/tutorial", "walk me through", "how do I use this".
+description: Interactive walkthrough for new users. Learn by doing — each step creates real content in your vault. Three tracks (researcher, manager, personal) with a universal learning arc. Triggers on "/arscontexta:tutorial", "walk me through", "how do I use this".
 user-invocable: true
 allowed-tools: Read, Write, Edit, Grep, Glob, AskUserQuestion, Bash
 context: fork
@@ -223,7 +223,7 @@ If connected:
     [[note A]] connects to [[note B]]
     because [your articulated reason]
 
-  This is what /reflect does at scale --
+  This is what /arscontexta:connect does at scale --
   finding genuine connections across your
   entire graph.
 ```
@@ -260,9 +260,9 @@ Adapt to track:
 
 | Track | WHY Framing |
 |-------|-------------|
-| researcher | "A paper contains dozens of claims, but only some matter for your research. Extraction means identifying the propositions worth keeping — the specific claims, the methodological choices, the surprising findings — and turning each into its own note. This is /{reduce} in action." |
-| manager | "Meeting notes and strategy docs contain buried insights. Extraction means finding the decisions, the assumptions, the risk factors — and giving each its own note that can be tracked and connected. This is /{reduce} in action." |
-| personal | "Journal entries and daily notes contain unprocessed observations. Extraction means finding the insights, the patterns, the genuine realizations — and crystallizing each into a note that compounds with everything else. This is /{reduce} in action." |
+| researcher | "A paper contains dozens of claims, but only some matter for your research. Extraction means identifying the propositions worth keeping — the specific claims, the methodological choices, the surprising findings — and turning each into its own note. This is /arscontexta:extract in action." |
+| manager | "Meeting notes and strategy docs contain buried insights. Extraction means finding the decisions, the assumptions, the risk factors — and giving each its own note that can be tracked and connected. This is /arscontexta:extract in action." |
+| personal | "Journal entries and daily notes contain unprocessed observations. Extraction means finding the insights, the patterns, the genuine realizations — and crystallizing each into a note that compounds with everything else. This is /arscontexta:extract in action." |
 
 **DO:**
 
@@ -290,7 +290,7 @@ Extract 1-2 atomic insights:
      [connection status: linked to [[note]] | standalone]
 
   Raw material -> atomic {vocabulary.note_plural} -> connected graph.
-  This is what /{reduce} does. It finds the
+  This is what /arscontexta:extract does. It finds the
   propositions worth keeping and turns each into
   a composable {vocabulary.note}.
 ```
@@ -354,7 +354,7 @@ For each check, report PASS or WARN with specifics.
   | Orphan risk        | PASS   | All notes connected |
   | Connection density | PASS   | Avg [N] links/note  |
 
-  This is what /health does at scale. It catches
+  This is what /arscontexta:health does at scale. It catches
   problems automatically so the graph stays
   healthy as it grows.
 ```
@@ -410,15 +410,15 @@ Then show methodology awareness:
 ```
 Your system also knows about itself:
   ops/methodology/   Your system's self-knowledge
-  /ask [question]    Ask the research behind your
-                     system's design
+  /arscontexta:ask [question]
+      Ask the research behind your system's design
 
-Try: /ask "why does my system use [relevant feature]?"
+Try: /arscontexta:ask "why does my system use [relevant feature]?"
 ```
 
 Then use AskUserQuestion:
 
-"What would you like to work on next? You can:\n\n  (a) Capture more thoughts (just tell me)\n  (b) Process raw material (/{reduce} [paste or file])\n  (c) Explore your system (/next)\n  (d) Learn more about a specific command (/help [command])"
+"What would you like to work on next? You can:\n\n  (a) Capture more thoughts (just tell me)\n  (b) Process raw material (/arscontexta:extract [paste or file])\n  (c) Explore your system (/arscontexta:next)\n  (d) Learn more about a specific command (/arscontexta:help [command])"
 
 This is the handoff to productive use. Do not process the response — just acknowledge their choice and point them in the right direction.
 
@@ -434,13 +434,13 @@ This is the handoff to productive use. Do not process the response — just ackn
   compounds the value of what already exists.
 
   Quick reference:
-    /ask [question]     Query your graph
-    /learn [topic]      Research and grow
-    /{reduce} [source]  Extract insights
-    /{reflect}          Find connections
-    /health             Check system health
-    /next               What to do next
-    /help               Full command guide
+    /arscontexta:ask [question]  Query your graph
+    /arscontexta:learn [topic]   Research and grow
+    /arscontexta:extract [src]   Extract insights
+    /arscontexta:connect         Find connections
+    /arscontexta:health          Check system health
+    /arscontexta:next            What to do next
+    /arscontexta:help            Full command guide
 ```
 
 ---
@@ -471,7 +471,7 @@ last_activity: [ISO 8601 UTC]
 completed: [ISO 8601 UTC, only when done]
 ```
 
-**Session-start integration:** If state exists and incomplete, the session-start hook should surface: "You have an unfinished tutorial (step N of 5). Resume with /tutorial."
+**Session-start integration:** If state exists and incomplete, the session-start hook should surface: "You have an unfinished tutorial (step N of 5). Resume with /arscontexta:tutorial."
 
 ## Quality Principles
 
@@ -491,6 +491,6 @@ completed: [ISO 8601 UTC, only when done]
 
 **User wants to skip a step:** Allow it. Update state to mark the step as skipped (not completed). The tutorial should not feel like a gate.
 
-**User re-runs /tutorial after completion:** Show completion status and offer reset. "Your tutorial is complete. Run /tutorial reset to start fresh."
+**User re-runs /arscontexta:tutorial after completion:** Show completion status and offer reset. "Your tutorial is complete. Run /arscontexta:tutorial reset to start fresh."
 
 **User input is too short (single word):** Gently expand. "Can you develop that into a full sentence? The system works best with complete thoughts — for example, instead of 'meetings' try 'weekly meetings lose value when action items are not tracked'."

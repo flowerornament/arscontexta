@@ -1,6 +1,6 @@
 ---
 name: help
-description: Contextual guidance and command discovery. Three modes — narrative (first-time), contextual (mid-task), compact (quick reference). Shows available commands, active skills, and intelligent suggestions based on vault state. Triggers on "/help", "what can I do", "show commands", "how does this work".
+description: Contextual guidance and command discovery. Three modes — narrative (first-time), contextual (mid-task), compact (quick reference). Shows available commands, active skills, and intelligent suggestions based on vault state. Triggers on "/arscontexta:help", "what can I do", "show commands", "how does this work".
 user-invocable: true
 allowed-tools: Read, Grep, Glob, Bash
 version: "1.0"
@@ -43,11 +43,11 @@ Determine the **notes folder** by checking which domain-named directory exists (
 - **Session count:** estimate from `ops/sessions/` file count (indicates usage maturity)
 
 ```bash
-# Quick state gathering
-note_count=$(ls -1 {vocabulary.notes}/*.md 2>/dev/null | wc -l | tr -d ' ')
-inbox_count=$(ls -1 {vocabulary.inbox}/*.md 2>/dev/null | wc -l | tr -d ' ')
-obs_count=$(ls -1 ops/observations/*.md ops/methodology/*.md 2>/dev/null | wc -l | tr -d ' ')
-tension_count=$(ls -1 ops/tensions/*.md 2>/dev/null | wc -l | tr -d ' ')
+# Quick state gathering (use find, not ls — zsh errors on unmatched globs)
+note_count=$(find {vocabulary.notes} -maxdepth 1 -name '*.md' 2>/dev/null | wc -l | tr -d ' ')
+inbox_count=$(find {vocabulary.inbox} -maxdepth 1 -name '*.md' 2>/dev/null | wc -l | tr -d ' ')
+obs_count=$(find ops/observations ops/methodology -maxdepth 1 -name '*.md' 2>/dev/null | wc -l | tr -d ' ')
+tension_count=$(find ops/tensions -maxdepth 1 -name '*.md' 2>/dev/null | wc -l | tr -d ' ')
 ```
 
 ## Step 2: Resolve Domain Vocabulary
@@ -61,7 +61,7 @@ For display, show domain name with universal in parentheses when they differ:
 
 If domain name equals universal name, show just the name:
 ```
-  /reduce   Extract insights from source material
+  /arscontexta:extract   Extract insights from source material
 ```
 
 ## Step 3: Determine Mode
@@ -84,11 +84,11 @@ Extract `name:` and `description:` from each frontmatter. Do NOT hardcode the co
 
 | Category | Commands | When to Show |
 |----------|----------|-------------|
-| Core | /ask, /learn, /next, /help | Always |
-| Processing | /reduce, /reflect, /reweave, /verify | Always (all skills from day one) |
-| Maintenance | /health, /rethink, /remember | Always |
-| Evolution | /architect, /reseed, /add-domain, /upgrade | Always |
-| Meta | /tutorial, /graph, /stats | Always |
+| Core | /arscontexta:ask, /arscontexta:learn, /arscontexta:next, /arscontexta:help | Always |
+| Processing | /arscontexta:extract, /arscontexta:connect, /arscontexta:reweave, /arscontexta:verify | Always (all skills from day one) |
+| Maintenance | /arscontexta:health, /arscontexta:rethink, /arscontexta:remember | Always |
+| Evolution | /arscontexta:architect, /arscontexta:reseed, /arscontexta:add-domain, /arscontexta:upgrade | Always |
+| Meta | /arscontexta:tutorial, /arscontexta:graph, /arscontexta:stats | Always |
 
 ## Step 5: Render
 
@@ -120,27 +120,20 @@ Getting started:
 
   Or try one of these:
 
-  /ask [question]    Ask about [domain] -- I will
-                     answer from your graph
-  /learn [topic]     Research [topic] and grow
-                     your graph with findings
-  /tutorial          Walk through the system
-                     step by step (5 minutes)
+  /arscontexta:ask [question]  Ask about [domain]
+  /arscontexta:learn [topic]   Research and grow graph
+  /arscontexta:tutorial        Step-by-step walkthrough
 
-As your graph grows, you will use:
-  /reduce [source]   Extract insights from articles,
-                     notes, or any raw material
-  /reflect           Find connections between notes
-  /health            Check your system's health
+As your graph grows:
+  /arscontexta:extract [src]   Extract claims from material
+  /arscontexta:connect         Find connections
+  /arscontexta:health          Check system health
 
-Your system also learns from experience:
-  /remember             Capture when something goes wrong
-                        (your system remembers corrections)
-  /ask [question]       Ask about [domain] -- answers draw
-                        from 249 methodology notes AND your
-                        system's own methodology notes
+Your system learns from experience:
+  /arscontexta:remember        Capture corrections
+  /arscontexta:rethink         Challenge assumptions
 
-Type /help anytime for guidance.
+Type /arscontexta:help anytime for guidance.
 ```
 
 **Manual reference (if manual/ exists):**
@@ -155,7 +148,7 @@ If the vault contains a `manual/` directory, add to the narrative output:
 - Show the easiest entry point first ("tell me a thought")
 - Group commands by when the user would need them, not alphabetically
 - Reference the user's actual domain when possible
-- If tutorial is incomplete, mention: "You have an unfinished tutorial (step N of 5). Resume with /tutorial"
+- If tutorial is incomplete, mention: "You have an unfinished tutorial (step N of 5). Resume with /arscontexta:tutorial"
 
 ### CONTEXTUAL MODE (note count >= 5)
 
@@ -177,7 +170,7 @@ Your system: [domain] knowledge graph
 Right now:
   [State-aware observations — pick up to 3 most relevant:]
   Your inbox has [N] items (oldest: [age])
-  [N] pending observations -- approaching /rethink threshold
+  [N] pending observations -- approaching /arscontexta:rethink threshold
   Pipeline: [N] tasks at [phase] phase
   [N] notes have sparse connections (< 2 links)
 
@@ -186,29 +179,28 @@ Suggested:
 
 [If user hasn't tried certain commands:]
 Commands you might not know:
-  /remember    Capture when something goes wrong
-               (teaches your system from friction)
-  /graph       Explore your knowledge graph visually
-  /stats       See vault metrics in shareable format
+  /arscontexta:remember        Capture friction as learning
+  /arscontexta:graph           Explore graph visually
+  /arscontexta:stats           Vault metrics snapshot
 
 All commands:
-  /ask [question]        Query your knowledge system
-  /learn [topic]         Research and grow your graph
-  /next                  Next recommended action
-  /{reduce} [source]     Extract insights from material
-  /{reflect}             Find connections between notes
-  /{reweave}             Update older notes
-  /verify [note]         Combined quality verification
-  /health                Run vault diagnostics
-  /{rethink}             Challenge assumptions
-  /remember              Capture methodology learning
-  /architect             Research-backed evolution advice
-  /reseed                Principled restructuring
-  /add-domain            Extend with a new domain
-  /upgrade               Check for skill improvements
-  /tutorial              Interactive walkthrough
-  /graph                 Graph exploration
-  /stats                 Vault metrics
+  /arscontexta:ask [question]  Query your knowledge system
+  /arscontexta:learn [topic]   Research and grow graph
+  /arscontexta:next            Next recommended action
+  /arscontexta:extract [src]   Extract claims from material
+  /arscontexta:connect         Find connections
+  /arscontexta:reweave         Update older notes
+  /arscontexta:verify [note]   Quality verification
+  /arscontexta:health          Vault diagnostics
+  /arscontexta:rethink         Challenge assumptions
+  /arscontexta:remember        Capture methodology learning
+  /arscontexta:architect       Evolution advice
+  /arscontexta:reseed          Principled restructuring
+  /arscontexta:add-domain      Add new domain
+  /arscontexta:upgrade         Check for improvements
+  /arscontexta:tutorial        Interactive walkthrough
+  /arscontexta:graph           Graph exploration
+  /arscontexta:stats           Vault metrics
 ```
 
 **State-aware suggestion logic:**
@@ -217,16 +209,16 @@ Pick the FIRST matching condition:
 
 | Condition | Suggestion |
 |-----------|-----------|
-| Inbox has items | `Process your inbox: /{reduce} [oldest-inbox-item-filename]` |
-| Pipeline has pending tasks | `Resume processing: /next` |
-| 10+ observations or 5+ tensions | `Review accumulated evidence: /{rethink}` |
-| Health warnings exist | `Check health: /health` |
-| Notes exist, sparse connections | `Build connections: /{reflect}` |
-| User hasn't tried /learn | `Grow your graph: /learn [topic related to their domain]` |
-| Methodology folder has friction notes | `Your system is learning from friction -- review with /{rethink}` |
-| Methodology folder has notes beyond derivation-rationale | `Your system has [N] operational learnings -- query them with /ask or browse ops/methodology/` |
-| Sessions accumulating without mining | `Mine session learnings: /remember` |
-| Healthy vault, no pressure | `What is next: /next` |
+| Inbox has items | `Process your inbox: /arscontexta:extract [oldest-inbox-item-filename]` |
+| Pipeline has pending tasks | `Resume processing: /arscontexta:next` |
+| 10+ observations or 5+ tensions | `Review accumulated evidence: /arscontexta:rethink` |
+| Health warnings exist | `Check health: /arscontexta:health` |
+| Notes exist, sparse connections | `Build connections: /arscontexta:connect` |
+| User hasn't tried /arscontexta:learn | `Grow your graph: /arscontexta:learn [topic related to their domain]` |
+| Methodology folder has friction notes | `Your system is learning from friction -- review with /arscontexta:rethink` |
+| Methodology folder has notes beyond derivation-rationale | `Your system has [N] operational learnings -- query them with /arscontexta:ask or browse ops/methodology/` |
+| Sessions accumulating without mining | `Mine session learnings: /arscontexta:remember` |
+| Healthy vault, no pressure | `What is next: /arscontexta:next` |
 
 Reference a specific file when possible (e.g., the actual oldest inbox filename, the actual pending task description).
 
@@ -237,7 +229,7 @@ Based on the first matching state-aware condition, suggest the relevant manual p
 |-----------|------------|
 | Inbox has items | [[workflows]] (processing pipeline) |
 | Pipeline has pending tasks | [[workflows]] (batch processing) |
-| Observations/tensions accumulated | [[meta-skills]] (/rethink guide) |
+| Observations/tensions accumulated | [[meta-skills]] (/arscontexta:rethink guide) |
 | Health warnings exist | [[troubleshooting]] |
 | Sparse connections | [[workflows]] (connection finding) |
 | General orientation needed | [[getting-started]] |
@@ -247,10 +239,10 @@ Add: `For details, see manual/{page}.md`
 **"Commands you might not know" logic:**
 
 Track which commands the user has likely used by checking for their artifacts:
-- /learn used if `ops/sessions/` has learn-related transcripts or inbox has research files
-- /remember used if `ops/methodology/` or `ops/observations/` has files
-- /graph used if... (no artifact, always suggest if note count > 20)
-- /stats used if... (no artifact, always suggest if note count > 10)
+- /arscontexta:learn used if `ops/sessions/` has learn-related transcripts or inbox has research files
+- /arscontexta:remember used if `ops/methodology/` or `ops/observations/` has files
+- /arscontexta:graph used if... (no artifact, always suggest if note count > 20)
+- /arscontexta:stats used if... (no artifact, always suggest if note count > 10)
 
 Show up to 3 commands the user probably has not tried. Skip commands they clearly have used.
 
@@ -261,29 +253,29 @@ Quick reference. No state analysis. No suggestions. Just the commands.
 ```
 --=={ ars contexta : help --compact }==--
 
-  /ask [question]        Query knowledge system
-  /learn [topic]         Research and grow graph
-  /next                  Next recommended action
-  /{reduce} [source]     Extract insights
-  /{reflect}             Find connections
-  /{reweave}             Update older notes
-  /verify [note]         Quality verification
-  /health                Vault diagnostics
-  /{rethink}             Challenge assumptions
-  /remember              Capture methodology learning
-  /architect             Evolution advice
-  /reseed                Restructure system
-  /add-domain            Add new domain
-  /upgrade               Check for improvements
-  /tutorial              Interactive walkthrough
-  /graph                 Graph exploration
-  /stats                 Vault metrics
-  /help                  This guide
+  /arscontexta:ask [question]  Query knowledge system
+  /arscontexta:learn [topic]   Research and grow graph
+  /arscontexta:next            Next recommended action
+  /arscontexta:extract [src]   Extract claims from material
+  /arscontexta:connect         Find connections
+  /arscontexta:reweave         Update older notes
+  /arscontexta:verify [note]   Quality verification
+  /arscontexta:health          Vault diagnostics
+  /arscontexta:rethink         Challenge assumptions
+  /arscontexta:remember        Capture methodology learning
+  /arscontexta:architect       Evolution advice
+  /arscontexta:reseed          Restructure system
+  /arscontexta:add-domain      Add new domain
+  /arscontexta:upgrade         Check for improvements
+  /arscontexta:tutorial        Interactive walkthrough
+  /arscontexta:graph           Graph exploration
+  /arscontexta:stats           Vault metrics
+  /arscontexta:help            This guide
 ```
 
 ### SKILL DETAIL MODE (help [skill-name])
 
-When the user asks for help with a specific skill (e.g., `/help reduce` or `/help reflect`):
+When the user asks for help with a specific skill (e.g., `/arscontexta:help reduce` or `/arscontexta:help reflect`):
 
 1. Find the skill's SKILL.md file
 2. Read its frontmatter (name, description) and first section
@@ -309,7 +301,7 @@ Related:
   /{related-skill}    {one-line description}
 ```
 
-**Special case for /help ask:** Expand the "What it does" section to mention both knowledge layers:
+**Special case for /arscontexta:help ask:** Expand the "What it does" section to mention both knowledge layers:
 ```
 What it does:
   Queries the bundled methodology knowledge base (249
@@ -331,9 +323,9 @@ Extract the pipeline position (what comes before and after this skill) to show w
 - No ANSI color codes
 - No emoji
 - Monospaced alignment assumed
-- Display short command forms (`/reduce`), not plugin-qualified forms (`/arscontexta:reduce`)
-- Domain-native names in curly braces (e.g., `/{reduce}`) are resolved from derivation-manifest.md
-- When domain name equals universal name, drop the braces
+- Display short command forms (`/arscontexta:extract`), not plugin-qualified forms (`/arscontexta:reduce`)
+- All commands use the /arscontexta: prefix (e.g., /arscontexta:extract)
+- Command names are resolved from derivation-manifest.md vocabulary
 
 ## Edge Cases
 
@@ -342,7 +334,7 @@ Extract the pipeline position (what comes before and after this skill) to show w
 **Pre-init invocation:** If no vault structure exists at all (no notes folder, no ops/), show a minimal message:
 ```
 Ars Contexta is not initialized in this directory.
-Run /setup to create your knowledge system.
+Run /arscontexta:setup to create your knowledge system.
 ```
 
 **Multiple domains:** If `ops/derivation-manifest.md` lists multiple domains, show commands grouped by domain in contextual mode.

@@ -1,12 +1,13 @@
 ---
 name: health
-description: Run condition-based vault health diagnostics. 8 categories — schema compliance, orphan detection, link health, description quality, three-space boundaries, processing throughput, stale notes, MOC coherence. 3 modes — quick (schema+orphans+links), full (all 8), three-space (boundary violations only). Returns actionable FAIL/WARN/PASS report with specific fixes ranked by impact. Triggers on "/health", "check vault health", "maintenance report", "what needs fixing".
+description: Run condition-based vault health diagnostics. 8 categories — schema compliance, orphan detection, link health, description quality, three-space boundaries, processing throughput, stale notes, MOC coherence. 3 modes — quick (schema+orphans+links), full (all 8), three-space (boundary violations only). Returns actionable FAIL/WARN/PASS report with specific fixes ranked by impact. Triggers on "/arscontexta:health", "check vault health", "maintenance report", "what needs fixing".
 version: "1.0"
 generated_from: "arscontexta-v1.6"
 context: fork
 model: opus
 allowed-tools: Read, Grep, Glob, Bash, mcp__qmd__vector_search
 argument-hint: "[optional: 'quick', 'full', or 'three-space']"
+user-invocable: true
 ---
 
 ## Runtime Configuration (Step 0 — before any processing)
@@ -152,7 +153,7 @@ done
       - notes/new-claim.md (created 2h ago — awaiting reflect) [INFO]
       - notes/old-observation.md (created 5d ago) [WARN]
       - notes/forgotten-insight.md (created 14d ago) [FAIL]
-    Recommendation: run /reflect on forgotten-insight.md and old-observation.md
+    Recommendation: run /arscontexta:connect on forgotten-insight.md and old-observation.md
 ```
 
 ### Category 3: Link Health (quick, full)
@@ -347,7 +348,7 @@ fi
         - Should be in ops/queue/ not notes/
     1 potential trapped knowledge:
       - ops/observations/interesting-pattern.md has note-like schema
-        Consider promoting to notes/ via /reduce or direct creation
+        Consider promoting to notes/ via /arscontexta:extract or direct creation
     Recommendation: move task-tracking.md to ops/queue/
 ```
 
@@ -387,7 +388,7 @@ echo "Inbox: $INBOX_COUNT | Notes: $NOTES_COUNT | In-progress: $QUEUE_COUNT | Ra
 [6] Processing Throughput ........ WARN
     inbox: 12 | notes: 8 | in-progress: 3 | ratio: 60%
     Inbox items outnumber processed notes — collector's fallacy risk
-    Recommendation: run /reduce on oldest inbox items or /pipeline for end-to-end processing
+    Recommendation: run /arscontexta:extract on oldest inbox items or /arscontexta:pipeline for end-to-end processing
 ```
 
 ### Category 7: Stale Note Detection (full only)
@@ -439,7 +440,7 @@ done
       - notes/early-claim.md (45d, 1 link) [WARN]
       - notes/setupial-thought.md (38d, 1 link) [WARN]
       - notes/first-draft.md (31d, 0 links) [WARN]
-    Recommendation: run /reweave on these notes to find connections, or archive if no longer relevant
+    Recommendation: run /arscontexta:reweave on these notes to find connections, or archive if no longer relevant
 ```
 
 ### Category 8: {vocabulary.topic_map} Coherence (full only)
@@ -511,13 +512,13 @@ After running all applicable diagnostic categories, check these condition-based 
 
 | Condition | Threshold | Recommendation |
 |-----------|-----------|---------------|
-| Pending observations | >= 10 files in ops/observations/ | Consider running /rethink |
-| Open tensions | >= 5 files in ops/tensions/ | Consider running /rethink |
-| Inbox items | >= 3 items | Consider /reduce or /pipeline |
-| Unprocessed sessions | >= 5 files in ops/sessions/ | Consider /remember --mine-sessions |
-| Orphan notes | Any persistent (> 7d) | Run /reflect on orphaned notes |
+| Pending observations | >= 10 files in ops/observations/ | Consider running /arscontexta:rethink |
+| Open tensions | >= 5 files in ops/tensions/ | Consider running /arscontexta:rethink |
+| Inbox items | >= 3 items | Consider /arscontexta:extract or /arscontexta:pipeline |
+| Unprocessed sessions | >= 5 files in ops/sessions/ | Consider /arscontexta:remember --mine-sessions |
+| Orphan notes | Any persistent (> 7d) | Run /arscontexta:connect on orphaned notes |
 | Dangling links | Any | Fix broken references immediately |
-| Stale notes | Low links + old | Consider /reweave |
+| Stale notes | Low links + old | Consider /arscontexta:reweave |
 | {vocabulary.topic_map} oversized | > 40 notes | Consider splitting |
 | Queue stalled | Tasks pending > 2 sessions without progress | Surface as blocked |
 | Trigger coverage gap | Known maintenance condition has no configured trigger | Flag gap itself |
@@ -616,7 +617,7 @@ Recommended Actions (top 3, ranked by impact):
 
 Write every health report to `ops/health/YYYY-MM-DD-report.md`. If multiple reports are run on the same day, append a counter: `YYYY-MM-DD-report-2.md`.
 
-This creates a health history that /architect can reference when proposing evolution. Trends across reports reveal systemic patterns that individual reports miss.
+This creates a health history that /arscontexta:architect can reference when proposing evolution. Trends across reports reveal systemic patterns that individual reports miss.
 
 ---
 
@@ -685,7 +686,7 @@ Runs all 8 categories plus maintenance signals.
 - Periodic comprehensive health review
 - After significant vault changes (large batch processing, restructuring)
 - When something "feels wrong" about the vault
-- Before a /architect or /reseed session
+- Before a /arscontexta:architect or /arscontexta:reseed session
 
 **Runtime:** May take 1-3 minutes for larger vaults due to description quality analysis and {vocabulary.topic_map} coherence checks.
 
@@ -694,7 +695,7 @@ Runs all 8 categories plus maintenance signals.
 Runs category 5 only: boundary violation checks.
 
 **Use when:**
-- After /reseed to verify boundaries are intact
+- After /arscontexta:reseed to verify boundaries are intact
 - When search results seem contaminated (ops content in knowledge queries)
 - When self/ is being enabled or disabled
 - Debugging "why does my search return weird results?"
@@ -711,7 +712,7 @@ A vault with 0 notes is not unhealthy — it is new. Report:
 ```
 Notes scanned: 0 | Topic maps: 0 | Inbox items: N
 All categories PASS (no notes to check)
-Maintenance Signal: inbox has N items — consider /reduce to start building knowledge
+Maintenance Signal: inbox has N items — consider /arscontexta:extract to start building knowledge
 ```
 
 ### Self Space Disabled
@@ -742,19 +743,19 @@ Health report findings feed into other skills:
 
 | Finding | Feeds Into | How |
 |---------|-----------|-----|
-| Orphan notes | /reflect | Run reflect to find connections for orphaned notes |
-| Stale notes | /reweave | Run reweave to update old notes with new connections |
-| Description quality issues | /verify or manual rewrite | Fix descriptions to improve retrieval |
-| Schema violations | /validate | Run validation to fix specific schema issues |
+| Orphan notes | /arscontexta:connect | Run reflect to find connections for orphaned notes |
+| Stale notes | /arscontexta:reweave | Run reweave to update old notes with new connections |
+| Description quality issues | /arscontexta:verify or manual rewrite | Fix descriptions to improve retrieval |
+| Schema violations | /arscontexta:validate | Run validation to fix specific schema issues |
 | Boundary violations | Manual restructuring | Move files to correct space |
-| Processing throughput | /reduce or /pipeline | Process inbox items to improve ratio |
-| {vocabulary.topic_map} oversized | Manual split or /architect | Split oversized {vocabulary.topic_maps} into sub-{vocabulary.topic_maps} |
-| Accumulated observations | /rethink | Review and triage observations |
-| Accumulated tensions | /rethink | Resolve or dissolve tensions |
+| Processing throughput | /arscontexta:extract or /arscontexta:pipeline | Process inbox items to improve ratio |
+| {vocabulary.topic_map} oversized | Manual split or /arscontexta:architect | Split oversized {vocabulary.topic_maps} into sub-{vocabulary.topic_maps} |
+| Accumulated observations | /arscontexta:rethink | Review and triage observations |
+| Accumulated tensions | /arscontexta:rethink | Resolve or dissolve tensions |
 
 **The health-to-action loop:**
 ```
-/health (diagnose) -> specific findings -> specific skill invocation -> /health (verify fix)
+/arscontexta:health (diagnose) -> specific findings -> specific skill invocation -> /arscontexta:health (verify fix)
 ```
 
-Health is diagnostic only — it measures state without prescribing changes. /architect reads health reports and proposes changes with research backing. The separation matters: health tells you WHAT is wrong, architect tells you WHY and HOW to fix it.
+Health is diagnostic only — it measures state without prescribing changes. /arscontexta:architect reads health reports and proposes changes with research backing. The separation matters: health tells you WHAT is wrong, architect tells you WHY and HOW to fix it.

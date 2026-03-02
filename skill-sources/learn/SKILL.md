@@ -1,6 +1,6 @@
 ---
 name: learn
-description: Research a topic and grow your knowledge graph. Uses Exa deep researcher, web search, or basic search to investigate topics, files results with full provenance, and chains to processing pipeline. Triggers on "/learn", "/learn [topic]", "research this", "find out about".
+description: Research a topic and grow your knowledge graph. Uses Exa deep researcher, web search, or basic search to investigate topics, files results with full provenance, and chains to processing pipeline. Triggers on "/arscontexta:learn", "/arscontexta:learn [topic]", "research this", "find out about".
 user-invocable: true
 allowed-tools: Read, Write, Edit, Grep, Glob, Bash, mcp__exa__web_search_exa, mcp__exa__deep_researcher_start, mcp__exa__deep_researcher_check, WebSearch
 context: fork
@@ -49,8 +49,8 @@ pipeline:
 
 **From derivation-manifest.md** (universal defaults if missing):
 - Inbox folder: `inbox/` (could be `journal/`, `encounters/`, etc.)
-- Reduce skill name: `/reduce` (could be `/surface`, `/break-down`, etc.)
-- Domain name and hub MOC name
+- Reduce skill name: `/arscontexta:extract` (could be `/surface`, `/break-down`, etc.)
+- Domain name and hub topic map name
 
 ---
 
@@ -241,7 +241,7 @@ Researching: [topic]
 
 ## Skill Selection Routing
 
-After /learn, the self-building loop continues:
+After /arscontexta:learn, the self-building loop continues:
 
 | Phase | Skill | Purpose |
 |-------|-------|---------|
@@ -250,4 +250,4 @@ After /learn, the self-building loop continues:
 | Update old notes | /[reweave-name] | Backward pass on touched notes |
 | Quality check | /[verify-name] | Description quality, schema, links |
 
-/learn is the entry point. Each run feeds the graph, and the graph feeds the next direction through goals.md.
+/arscontexta:learn is the entry point. Each run feeds the graph, and the graph feeds the next direction through goals.md.
